@@ -64,4 +64,4 @@ jobs:
 
         echo [JUPYTERHUB_URL $JUPYTERHUB_URL]
         sh ./scripts/setup
-        ./scripts/deploy
+        sh ./scripts/deploy
