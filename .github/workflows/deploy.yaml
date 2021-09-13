@@ -39,7 +39,7 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-          export ENVIRONMENT={{ steps.environment.outputs.environment }}
+          export ENVIRONMENT=${{ steps.environment.outputs.environment }}
           echo "[Deploying ${ENVIRONMENT}]"
           # # export subscriptionId=$(subscriptionId)
           # # # For Terraform
