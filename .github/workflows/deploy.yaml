@@ -8,6 +8,7 @@ on:
       - created
 
 jobs:
+  deploy:
     runs-on: ubuntu-latest
     steps:
 
