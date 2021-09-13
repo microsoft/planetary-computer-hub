@@ -8,12 +8,8 @@ echo "[applying terraform]"
 terraform -chdir=terraform/${ENVIRONMENT} plan -out plan.tfstate
 terraform -chdir=terraform/${ENVIRONMENT} apply plan.tfstate
 
-echo "[getting resource group]"
-RESOURCE_GROUP=$(terraform -chdir=terraform/${ENVIRONMENT} output -json resources | jq -r .resource_group)
-echo "[getting cluster name]"
-CLUSTER_NAME=$(terraform -chdir=terraform/${ENVIRONMENT} output -json resources | jq -r .cluster_name)
 echo "[getting kubeconfig]"
-terraform -chdir=terraform/${ENVIRONMENT} output -json resources | jq -Rr .kubeconfig > .kubeconfig
+terraform -chdir=terraform/${ENVIRONMENT} output -json resources | jq -r .kubeconfig > .kubeconfig
 export KUBECONFIG=".kubeconfig"
 
 echo "[test deployment]"

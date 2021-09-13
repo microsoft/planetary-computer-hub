@@ -6,14 +6,6 @@ output "location" {
   value = local.location
 }
 
-output "resource_group" {
-  value = azurerm_resource_group.pc_compute.name
-}
-
-output "cluster_name" {
-  value = azurerm_kubernetes_cluster.pc_compute.name
-}
-
 output "id_client_secret" {
   value     = data.azurerm_key_vault_secret.id_client_secret.value
   sensitive = true
