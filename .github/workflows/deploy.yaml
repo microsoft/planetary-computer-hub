@@ -1,0 +1,66 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - main
+  release:
+    types:
+      - created
+
+jobs:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+
+    - name: Set environment
+      id: environment
+      run: |
+        echo ${{ github.event_name }}
+        if [[ ${{ github.event_name == 'release' }} == true ]]; then
+          environment=prod
+        else
+          environment=staging
+        fi
+        echo "environment: ${environment}"
+        echo "::set-output name=environment::${environment}"
+
+    - name: Azure CLI script
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          export ENVIRONMENT=$(environment)
+          echo "[Deploying ${ENVIRONMENT}]"
+          export subscriptionId=$(subscriptionId)
+          # For Terraform
+          export ARM_SUBSCRIPTION_ID=${subscriptionId}
+          export ARM_TENANT_ID=${tenantId}
+          export ARM_CLIENT_ID=${servicePrincipalId}
+          export ARM_CLIENT_SECRET=${servicePrincipalKey}
+          export TF_VAR_username=${USER}
+
+          # For Azure CLI
+          export AZURE_TENANT_ID=${tenantId}
+          export AZURE_CLIENT_ID=${servicePrincipalId}
+          export AZURE_CLIENT_SECRET=${servicePrincipalKey}
+
+          if [[ ${ENVIRONMENT} == "prod" ]]; then
+            export TEST_BOT_TOKEN=$(PROD_TESTBOT_TOKEN)
+            export JUPYTERHUB_URL="https://pccompute.westeurope.cloudapp.azure.com/compute"
+          else
+            export TEST_BOT_TOKEN=$(STAGING_TESTBOT_TOKEN)
+            export JUPYTERHUB_URL="https://pcc-staging.westeurope.cloudapp.azure.com/compute"
+          fi
+
+          echo [JUPYTERHUB_URL $JUPYTERHUB_URL]
+
+          sh ./scripts/setup
+          sh ./scripts/deploy
