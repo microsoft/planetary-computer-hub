@@ -37,10 +37,6 @@ jobs:
 
     - name: Azure CLI script
       env:
-        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_CREDENTIALS.subscriptionId }}
-        ARM_TENANT_ID: ${{ secrets.AZURE_CREDENTIALS.tenantId }}
-        ARM_CLIENT_ID: ${{ secrets.AZURE_CREDENTIALS.clientId }}
-        ARM_CLIENT_SECRET: ${{ secrets.AZURE_CREDENTIALS.clientSecret }}
         PROD_TEST_BOT_TOKEN: ${{ secrets.PROD_TEST_BOT_TOKEN }}
         STAGING_TEST_BOT_TOKEN: ${{ secrets.STAGING_TEST_BOT_TOKEN }}
       run: |
