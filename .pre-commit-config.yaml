@@ -12,7 +12,7 @@ repos:
     - id: terraform_fmt
     # terraform_docs currently not installing correctly.
     # - id: terraform_docs
-    - id: terraform_tflint
+    # - id: terraform_tflint
 
 # - repo: local
 #   hooks:
