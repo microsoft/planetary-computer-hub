@@ -40,7 +40,6 @@ output "resources" {
   sensitive = true
 }
 
-
 # We require this, since we used to generate the pcccr ACR
 provider "azurerm" {
   features {}

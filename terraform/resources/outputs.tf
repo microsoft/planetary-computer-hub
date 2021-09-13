@@ -46,3 +46,8 @@ output "stac_url" {
 output "user_placeholder_replicas" {
   value = var.user_placeholder_replicas
 }
+
+output "kubeconfig" {
+  value     = azurerm_kubernetes_cluster.pc_compute.kube_config_raw
+  sensitive = true
+}

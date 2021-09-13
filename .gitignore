@@ -13,3 +13,4 @@ package-lock.json
 package.json
 jupyterhub_cookie_secret
 jupyterhub-proxy.pid
+.kubeconfig

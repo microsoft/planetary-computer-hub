@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+echo "[jq]"
+sudo apt-get update
+sudo apt-get install -y jq
 
 echo "[terraform]"
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
@@ -14,6 +17,3 @@ echo "[kubectl]"
 curl -LO "https://storage.googleapis.com/kubernetes-release/release/v0.19.7/bin/linux/amd64/kubectl"
 chmod +x kubectl
 sudo mv kubectl /usr/bin/kubectl
-
-echo "[jinja]"
-python3 -m pip install jinja2

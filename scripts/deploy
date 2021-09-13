@@ -10,12 +10,8 @@ terraform -chdir=terraform/${ENVIRONMENT} apply plan.tfstate
 
 RESOURCE_GROUP=$(terraform -chdir=terraform/${ENVIRONMENT} output -json resources | jq -r .resource_group)
 CLUSTER_NAME=$(terraform -chdir=terraform/${ENVIRONMENT} output -json resources | jq -r .cluster_name)
-
-echo "[getting AKS credentials]"
-az aks get-credentials \
-    --resource-group "${RESOURCE_GROUP}" \
-    --name "${CLUSTER_NAME}" \
-    --subscription "Planetary Computer"
+terraform -chdir=terraform/${ENVIRONMENT} output -json resources | jq -r .kubeconfig > .kubeconfig
+export KUBECONFIG=".kubeconfig"
 
 echo "[test deployment]"
 ./tests/run.sh
