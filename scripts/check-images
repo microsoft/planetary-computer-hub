@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+from os import environ
+import itertools
+import sys
+import hcl
+import httpx
+import asyncio
+
+
+async def check_image(resources, key):
+    base = "https://mcr.microsoft.com/v2"
+    image, tag = resources[key].split(":")
+    name = image.split("/", 1)[-1]
+    async with httpx.AsyncClient() as client:
+        r = await client.get(f"{base}/{name}/tags/list")
+        r.raise_for_status()
+        data = r.json()
+
+    if tag not in data["tags"]:
+        return name, tag
+
+async def check_file(file):
+    with open(file) as f:
+        config = hcl.load(f)
+
+    resources = config["module"]["resources"]
+    keys = [
+        "python_image",
+        "r_image",
+        "gpu_pytorch_image",
+    ]
+    errors = []
+    for key in keys:
+        error = await check_image(resources, key)
+        if error:
+            errors.append(error)
+
+    return errors
+
+
+async def main(files):
+    errors = []
+    for file in files:
+        result = await check_file(file)
+        if result:
+            errors.extend(result)
+
+    if errors:
+        for name, tag in errors:
+            print(f"Missing image for {name}:{tag}")
+
+
+if __name__ == "__main__":
+    asyncio.run(main(sys.argv[1:]))

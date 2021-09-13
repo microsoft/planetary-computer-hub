@@ -1,0 +1,6 @@
+{
+    "name": "pc-hub-fake",
+    "dependencies": {
+        "dask-labextension": "5.0.1"
+    }
+}

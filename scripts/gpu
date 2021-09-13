@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# TODO(https://github.com/terraform-providers/terraform-provider-azurerm/issues/6793): use terraform
+# We need to pass `--aks-custom-headers` when creating the GPU pool, which
+# isn't currently supported by terraform.
+set -eu
+
+# Sync with overrides in singleuser
+# Our Subscription Quota is currently 128, and each NC4as_T4_V3
+# 4 vCPU cores / 28GiB memory / 1 GPU / 16GiB GPU mmemory
+export GPU_NODE_VM_SIZE=Standard_NC4as_T4_v3
+
+
+# TODO(https://github.com/terraform-providers/terraform-provider-azurerm/issues/6793)
+# Add to terraform. Requires --aks-custom-headers support
+az aks nodepool add --name gpuworker \
+    --cluster-name ${CLUSTER_NAME} \
+    --resource-group ${RESOURCE_GROUP_NAME} \
+    --node-vm-size ${GPU_NODE_VM_SIZE} \
+    --enable-cluster-autoscaler \
+    --node-count 0 \
+    --min-count=0 --max-count 25 \
+    --priority Spot \
+    --eviction-policy Delete \
+    --spot-max-price -1 \
+    --aks-custom-headers UseGPUDedicatedVHD=true \
+    --labels k8s.dask.org/dedicated=worker pc.microsoft.com/workerkind=gpu
+# User GPU pool
+az aks nodepool add --name gpuuser \
+    --cluster-name ${CLUSTER_NAME} \
+    --resource-group ${RESOURCE_GROUP_NAME} \
+    --node-vm-size ${GPU_NODE_VM_SIZE} \
+    --enable-cluster-autoscaler \
+    --node-count 0 \
+    --min-count=0 --max-count 25 \
+    --aks-custom-headers UseGPUDedicatedVHD=true \
+    --labels hub.jupyter.org/node-purpose=user hub.jupyter.org/pool-name=user-alpha-pool pc.microsoft.com/userkind=gpu \
+    --node-taints "hub.jupyter.org_dedicated=user:NoSchedule"

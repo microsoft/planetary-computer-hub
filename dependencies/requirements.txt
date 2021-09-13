@@ -1,0 +1,6 @@
+# Services
+jupyterhub=1.0.1
+dask-gateway=0.9.0
+# User Environments
+jupyterlab
+dask-labextension  # Sync with node side!

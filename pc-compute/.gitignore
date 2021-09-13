@@ -1,0 +1,15 @@
+.terraform
+.terraform.lock*
+tf.json
+plan.tfstate
+helm/common.yaml
+helm/staging.yaml
+helm/prod.yaml
+helm/monitoring/prometheus-config.yaml
+helm/monitoring/grafana-config.yaml
+node_modules
+jupyterhub.sqlite
+package-lock.json
+package.json
+jupyterhub_cookie_secret
+jupyterhub-proxy.pid

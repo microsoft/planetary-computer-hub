@@ -1,0 +1,97 @@
+trigger:
+  branches:
+    include:
+      - "main"
+  tags:
+    include:
+      - "*"
+
+pool:
+  vmImage: "ubuntu-18.04"
+
+variables:
+  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+  isTag: $[startsWith(variables['Build.SourceBranch'], 'refs/tags/')]
+  subscriptionId: 9da7523a-cb61-4c3e-b1d4-afa5fc6d2da9
+  branch: variables['Build.SourceBranch']
+  environment: staging
+
+jobs:
+
+  - job: Lint
+    steps:
+      - task: UsePythonVersion@0
+        displayName: 'Install Python'
+        inputs:
+          versionSpec: '3.8'
+          addToPath: true
+
+      - script: |
+          python -m pip install pre-commit
+          pre-commit install
+          curl -sL "https://github.com/terraform-linters/tflint/releases/download/v0.25.0/tflint_linux_amd64.zip" -o tflint.zip  && unzip tflint.zip && rm tflint.zip && sudo mv tflint /usr/bin/
+        displayName: 'Install pre-commit'
+
+      - task: AzureCLI@2
+        displayName: "Lint"
+        inputs:
+          scriptType: bash
+          scriptLocation: inlineScript
+          azureSubscription: 'Planetary Computer'
+          addSpnToEnvironment: true
+          inlineScript: |
+            pre-commit run --all-files
+
+  - job: Deploy
+    steps:
+
+      - bash: echo '##vso[task.setvariable variable=environment]prod'
+        displayName: Set new variable value
+        condition: eq(variables.isTag, true)
+
+      - task: UsePythonVersion@0
+        displayName: 'Install Python'
+        inputs:
+          versionSpec: '3.8'
+          addToPath: true
+
+      - task: AzureCLI@2
+        displayName: "Run deploy script"
+        inputs:
+          scriptType: bash
+          scriptLocation: inlineScript
+          azureSubscription: 'Planetary Computer'
+          addSpnToEnvironment: true
+          env:
+           PROD_TESTBOT_TOKEN=$(PROD_TESTBOT_TOKEN)
+           STAGING_TESTBOT_TOKEN=$(STAGING_TESTBOT_TOKEN)
+          inlineScript: |
+            export ENVIRONMENT=$(environment)
+            echo "[Deploying ${ENVIRONMENT}]"
+            export subscriptionId=$(subscriptionId)
+            # For Terraform
+            export ARM_SUBSCRIPTION_ID=${subscriptionId}
+            export ARM_TENANT_ID=${tenantId}
+            export ARM_CLIENT_ID=${servicePrincipalId}
+            export ARM_CLIENT_SECRET=${servicePrincipalKey}
+            export TF_VAR_username=${USER}
+
+            # For Azure CLI
+            export AZURE_TENANT_ID=${tenantId}
+            export AZURE_CLIENT_ID=${servicePrincipalId}
+            export AZURE_CLIENT_SECRET=${servicePrincipalKey}
+
+            if [[ ${ENVIRONMENT} == "prod" ]]; then
+              export TEST_BOT_TOKEN=$(PROD_TESTBOT_TOKEN)
+              export JUPYTERHUB_URL="https://pccompute.westeurope.cloudapp.azure.com/compute"
+            else
+              export TEST_BOT_TOKEN=$(STAGING_TESTBOT_TOKEN)
+              export JUPYTERHUB_URL="https://pcc-staging.westeurope.cloudapp.azure.com/compute"
+            fi
+
+            echo [JUPYTERHUB_URL $JUPYTERHUB_URL]
+
+            sh ./scripts/setup
+            sh ./scripts/deploy
+
+    condition: or(eq(variables.isMain, true), eq(variables.isTag, true))
