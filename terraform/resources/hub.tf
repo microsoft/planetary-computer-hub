@@ -18,7 +18,7 @@ resource "helm_release" "dhub" {
   create_namespace = true
 
   values = [
-    "${file("../../helm/values.yaml")}",
+    "${templatefile("../../helm/values.yaml", { jupyterhub_host = var.jupyterhub_host })}",
     "${file("../../helm/jupyterhub_opencensus_monitor.yaml")}",
     "${templatefile("../../helm/profiles.yaml", { python_image = var.python_image, r_image = var.r_image, gpu_pytorch_image = var.gpu_pytorch_image, qgis_image = var.qgis_image })}"
   ]
@@ -77,11 +77,6 @@ resource "helm_release" "dhub" {
   set {
     name  = "daskhub.jupyterhub.hub.services.opencensus-monitoring.environment.JUPYTERHUB_ENVIRONMENT"
     value = var.environment
-  }
-
-  set {
-    name  = "daskhub.jupyterhub.hub.config.extraConfig.01-set-dask-gateway-public-address"
-    value = "c.KubeSpawner.environment['DASK_GATEWAY__PUBLIC_ADDRESS'] = 'https://${var.jupyterhub_host}/compute/services/dask-gateway/'"
   }
 
   set {

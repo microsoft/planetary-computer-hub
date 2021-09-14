@@ -85,6 +85,8 @@ daskhub:
           # The daskhub helm chart doesn't correctly handle hub.baseUrl.
           # DASK_GATEWAY__PUBLIC_ADDRESS set via terraform
           c.KubeSpawner.environment["DASK_GATEWAY__ADDRESS"] = "http://proxy-http:8000/compute/services/dask-gateway/"
+        02-set-dask-gateway-public-address: |
+          c.KubeSpawner.environment['DASK_GATEWAY__PUBLIC_ADDRESS'] = 'https://${jupyterhub_host}/compute/services/dask-gateway/'
         templates: |
           c.JupyterHub.template_paths.insert(0, "/etc/jupyterhub/templates")
         pre_spawn_hook: |
