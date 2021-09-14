@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -eu
 
+cd helm/chart && \
+    helm dependency update && \
+    cd ../..
+
 echo "[init terraform]"
 terraform -chdir=terraform/${ENVIRONMENT} init
 
