@@ -7,7 +7,9 @@ module "resources" {
   # AKS ----------------------------------------------------------------------
   kubernetes_version = "1.21.2"
   # 2GiB of RAM, 1 CPU core
-  core_vm_size = "Standard_A2_v2"
+  core_vm_size              = "Standard_A2_v2"
+  user_pool_min_count       = 0
+  cpu_worker_pool_min_count = 0
 
   # Logs ---------------------------------------------------------------------
   workspace_id = "83dcaf36e047a90f"
