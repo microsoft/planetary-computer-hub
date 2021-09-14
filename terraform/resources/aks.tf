@@ -71,7 +71,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "user_pool" {
     "hub.jupyter.org/node-purpose" = "user",
   }
 
-  min_count = 1
+  min_count = var.user_pool_min_count
   max_count = 100
   tags = {
     Environment = "Production"
@@ -85,7 +85,6 @@ resource "azurerm_kubernetes_cluster_node_pool" "user_pool" {
   }
 
 }
-
 
 resource "azurerm_kubernetes_cluster_node_pool" "cpu_worker_pool" {
   name                  = "cpuworker"
@@ -109,7 +108,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "cpu_worker_pool" {
     "kubernetes.azure.com/scalesetpriority=spot:NoSchedule",
   ]
 
-  min_count = 1
+  min_count = var.cpu_worker_pool_min_count
   max_count = var.cpu_worker_max_count
   tags = {
     Environment = "Production"

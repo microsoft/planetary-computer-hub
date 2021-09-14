@@ -77,6 +77,16 @@ variable "core_vm_size" {
   description = "The VM size to use for the default / core AKS nodepool."
 }
 
+variable "user_pool_min_count" {
+  type        = number
+  description = "The minimum number of workers for the CPU user nodepool."
+}
+
+variable "cpu_worker_pool_min_count" {
+  type        = number
+  description = "The minimum number of workers for the CPU user nodepool."
+}
+
 variable "cpu_worker_vm_size" {
   type = string
   # VM with = 64GB of RAM, 8 cores, and ssd base disk
