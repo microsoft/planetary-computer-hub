@@ -8,8 +8,8 @@ module "resources" {
   kubernetes_version = "1.19.7"
   # 8GB of RAM, 4 CPU cores, ssd base disk
   core_vm_size              = "Standard_E4s_v3"
-  user_pool_min_count       = 0
-  cpu_worker_pool_min_count = 0
+  user_pool_min_count       = 1
+  cpu_worker_pool_min_count = 1
 
   # Logs ---------------------------------------------------------------------
   workspace_id = "225cedbd199c55da"
