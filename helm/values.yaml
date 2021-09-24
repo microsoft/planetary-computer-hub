@@ -160,7 +160,7 @@ daskhub:
         guarantee: 6.0
 
       storage:
-        capacity: "50Gi"
+        capacity: "15Gi"
         extraVolumes:
           - name: user-etc-singleuser
             configMap:
