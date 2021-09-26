@@ -19,11 +19,11 @@ module "resources" {
   jupyterhub_host                  = "pccompute.westeurope.cloudapp.azure.com"
   user_placeholder_replicas        = 1
   stac_url                         = "https://planetarycomputer.microsoft.com/api/stac/v1/"
-  jupyterhub_singleuser_image_name = "pcccr.azurecr.io/public/planetary-computer/python"
-  jupyterhub_singleuser_image_tag  = "2021.08.16.0"
-  python_image                     = "pcccr.azurecr.io/public/planetary-computer/python:2021.08.16.0"
-  r_image                          = "pcccr.azurecr.io/public/planetary-computer/r:2021.08.16.0"
-  gpu_pytorch_image                = "pcccr.azurecr.io/public/planetary-computer/gpu-pytorch:2021.08.17.2"
+  jupyterhub_singleuser_image_name = "mcr.microsoft.com/planetary-computer/python"
+  jupyterhub_singleuser_image_tag  = "2021.09.23.1"
+  python_image                     = "mcr.microsoft.com/planetary-computer/python:2021.09.23.1"
+  r_image                          = "mcr.microsoft.com/planetary-computer/r:2021.09.22.0"
+  gpu_pytorch_image                = "mcr.microsoft.com/planetary-computer/gpu-pytorch:2021.09.23.1"
   qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:3.18.0"
 
 }
