@@ -128,6 +128,8 @@ The `tests/` starts a notebook server for this user and verifies that a few comm
 
 We're able to customize the JupyterHub and jupyterlab UIs following the approach outlined in <https://discourse.jupyter.org/t/customizing-jupyterhub-on-kubernetes/1769/4>.
 
+To test changes to the templates locally, [install jupyterhub](https://jupyterhub.readthedocs.io/en/stable/installation-guide.html) and run it from the root of the project directory, which includes a `jupyterhub_config.py` file. Changes to the template files in `helm/chart/files/etc/jupyterhub/templates/` can be previewed at `localhost:8000`.
+
 ## Additional References
 
 Many of the concepts used here were learned in deployments at the [pangeo-cloud-federation](https://github.com/pangeo-data/pangeo-cloud-federation) and [2i2c pilot hubs](https://github.com/2i2c-org/pilot-hubs). Those might serve as additional references for how to deploy a Hub.
