@@ -23,7 +23,7 @@ module "resources" {
   jupyterhub_singleuser_image_tag  = "2021.09.23.1"
   python_image                     = "pcccr.azurecr.io/public/planetary-computer/python:2021.09.23.1"
   r_image                          = "pcccr.azurecr.io/public/planetary-computer/r:2021.09.22.0"
-  gpu_pytorch_image                = "mcr.microsoft.com/planetary-computer/gpu-pytorch:2021.09.28.0"
+  gpu_pytorch_image                = "pcccr.azurecr.io/public/planetary-computer/gpu-pytorch:2021.09.28.0"
   qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:3.18.0"
 
 }
