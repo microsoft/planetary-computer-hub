@@ -56,6 +56,11 @@ variable "gpu_pytorch_image" {
   description = "The tag for the GPU-pytorch environment image."
 }
 
+variable "gpu_tensorflow_image" {
+  type        = string
+  description = "The tag for the GPU-tensorflow environment image."
+}
+
 
 variable "qgis_image" {
   type        = string
