@@ -37,7 +37,7 @@ daskhub:
                   values:
                   - gpu
 
-        # GPU ------------------------------------------------------------------
+        # gpu-pytorch -------------------------------------------------------------
         - display_name: "GPU - PyTorch"
           description: '4 cores, 28 GiB of memory, <a href="https://docs.microsoft.com/en-us/azure/virtual-machines/nct4-v3-series">T4 GPU</a>. This has a longer startup time.'
           kubespawner_override:
@@ -63,6 +63,34 @@ daskhub:
                   operator: In
                   values:
                   - gpu
+
+        # gpu-tensorflow ----------------------------------------------------------
+        - display_name: "GPU - Tensorflow"
+          description: '4 cores, 28 GiB of memory, <a href="https://docs.microsoft.com/en-us/azure/virtual-machines/nct4-v3-series">T4 GPU</a>. This has a longer startup time.'
+          kubespawner_override:
+            cpu_guarantee: 3.5
+            cpu_limit: 4
+            image: "${gpu_tensorflow_image}"
+            mem_limit: "27G"
+            mem_guarantee: "20G"
+            extra_resource_limits: {"nvidia.com/gpu": "1"}
+            default_url: "/lab/tree/PlanetaryComputerExamples/README.md"
+            tolerations:
+              - key: 'nvidia.com/gpu'
+                operator: 'Equal'
+                value: 'present'
+                effect: 'NoSchedule'
+              - key: 'hub.jupyter.org_dedicated'
+                operator: 'Equal'
+                value: 'user'
+                effect: 'NoSchedule'
+            node_affinity_required:
+              - matchExpressions:
+                - key: pc.microsoft.com/userkind
+                  operator: In
+                  values:
+                  - gpu
+
 
         # QGIS -----------------------------------------------------------------
         - display_name: "QGIS (preview)"
