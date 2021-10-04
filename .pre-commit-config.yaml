@@ -14,13 +14,14 @@ repos:
     # - id: terraform_docs
     # - id: terraform_tflint
 
-# - repo: local
-#   hooks:
-#     - id: check_images
-#       name: check_images
-#       entry: ./scripts/check-images
-#       # files: "terraform/*/main.tf"
-#       language: python
-#       additional_dependencies:
-#         - hcl
-#         - httpx
+- repo: local
+  hooks:
+    - id: check_images
+      name: check_images
+      entry: ./scripts/check-images
+      files: "terraform/.*/main.tf"
+
+      language: python
+      additional_dependencies:
+        - pyhcl
+        - httpx
