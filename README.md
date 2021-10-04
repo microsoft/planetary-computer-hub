@@ -124,6 +124,14 @@ See `daskhub.jupyterhub.hub.extraConfig.pre_spawn_hook` in `values.yaml` for whe
 We used the JupyterHub admin panel to create a user for tests, `pangeotestbot@microsoft.com`.
 The `tests/` starts a notebook server for this user and verifies that a few common operations work.
 
+## ACR Integration
+
+A previous iteration used a common Azure Container Registry for both staging and prod. After splitting, we need to manually grant the staging cluster access to the ACR.
+
+```
+$ az aks update -n pcc-staging-cluster -g pcc-staging-rg --attach-acr pcccr
+```
+
 ## Custom UI
 
 We're able to customize the JupyterHub and jupyterlab UIs following the approach outlined in <https://discourse.jupyter.org/t/customizing-jupyterhub-on-kubernetes/1769/4>.
