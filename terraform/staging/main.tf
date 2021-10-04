@@ -24,7 +24,7 @@ module "resources" {
   python_image                     = "pcccr.azurecr.io/public/planetary-computer/python:2021.10.01.0"
   r_image                          = "pcccr.azurecr.io/public/planetary-computer/r:2021.09.22.0"
   gpu_pytorch_image                = "pcccr.azurecr.io/public/planetary-computer/gpu-pytorch:2021.09.28.0"
-  gpu_tensorflow_image             = "pcccr.azurecr.io/public/planetary-computer/tensorflow:2021.10.01.1"
+  gpu_tensorflow_image             = "pcccr.azurecr.io/public/planetary-computer/gpu-tensorflow:2021.10.01.0"
   qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:3.18.0"
 
 }

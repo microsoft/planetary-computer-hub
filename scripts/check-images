@@ -7,33 +7,41 @@ import httpx
 import asyncio
 
 
-async def check_image(resources, key):
-    base = "https://mcr.microsoft.com/v2"
-    image, tag = resources[key].split(":")
-    name = image.split("/", 1)[-1]
-    async with httpx.AsyncClient() as client:
-        r = await client.get(f"{base}/{name}/tags/list")
-        r.raise_for_status()
-        data = r.json()
+async def check_image(image_name):
+    cmd = [
+        "az",
+        "acr",
+        "repository",
+        "show",
+        "--name=pcccr",
+        f"--image={image_name}",
+    ]
+    proc = await asyncio.create_subprocess_shell(" ".join(cmd))
+    await proc.wait()
+    return proc.returncode
 
-    if tag not in data["tags"]:
-        return name, tag
 
 async def check_file(file):
     with open(file) as f:
         config = hcl.load(f)
 
-    resources = config["module"]["resources"]
-    keys = [
+    images = [
         "python_image",
         "r_image",
         "gpu_pytorch_image",
+        "gpu_tensorflow_image"
     ]
+
+    image_names = [
+        config["module"]["resources"][image].split("/", 1)[1] for image in images
+    ]
+
     errors = []
-    for key in keys:
-        error = await check_image(resources, key)
+    for image_name in image_names:
+        error = await check_image(image_name)
         if error:
-            errors.append(error)
+            print("error!", image_name, error)
+            errors.append(image_name)
 
     return errors
 
@@ -41,14 +49,15 @@ async def check_file(file):
 async def main(files):
     errors = []
     for file in files:
+        print(f"checking {file}")
         result = await check_file(file)
         if result:
             errors.extend(result)
 
     if errors:
-        for name, tag in errors:
-            print(f"Missing image for {name}:{tag}")
-
+        for image in errors:
+            print(f"Missing image for {image}")
+        return 1
 
 if __name__ == "__main__":
-    asyncio.run(main(sys.argv[1:]))
+    sys.exit(asyncio.run(main(sys.argv[1:])))
