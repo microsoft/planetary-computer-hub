@@ -18,8 +18,7 @@ async def check_image(image_name):
     ]
     proc = await asyncio.create_subprocess_shell(" ".join(cmd))
     await proc.wait()
-    print(proc.returncode)
-    return proc
+    return proc.returncode
 
 
 async def check_file(file):
@@ -41,6 +40,7 @@ async def check_file(file):
     for image_name in image_names:
         error = await check_image(image_name)
         if error:
+            print("error!", image_name, error)
             errors.append(image_name)
 
     return errors
@@ -57,7 +57,7 @@ async def main(files):
     if errors:
         for image in errors:
             print(f"Missing image for {image}")
-
+        return 1
 
 if __name__ == "__main__":
-    asyncio.run(main(sys.argv[1:]))
+    sys.exit(asyncio.run(main(sys.argv[1:])))
