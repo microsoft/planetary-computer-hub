@@ -4,5 +4,6 @@ resource "azurerm_resource_group" "pc_compute" {
   tags = {
     environment = var.environment
     component   = "hub"
+    ringValue   = "r1"
   }
 }

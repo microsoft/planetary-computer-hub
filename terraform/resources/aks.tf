@@ -73,6 +73,9 @@ resource "azurerm_kubernetes_cluster_node_pool" "user_pool" {
 
   min_count = var.user_pool_min_count
   max_count = 100
+
+  availability_zones = []
+
   tags = {
     Environment = "Production"
     ManagedBy   = "AI4E"
@@ -85,6 +88,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "user_pool" {
   }
 
 }
+
 
 resource "azurerm_kubernetes_cluster_node_pool" "cpu_worker_pool" {
   name                  = "cpuworker"
