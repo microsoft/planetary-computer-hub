@@ -72,7 +72,7 @@ variable "qgis_image" {
 
 variable "user_vm_size" {
   type = string
-  # VM with 32G of RAM, 8 cores, and ssd base disk
+  # VM with 64G of RAM, 8 cores, and ssd base disk
   default     = "Standard_E8s_v3"
   description = "The VM size to use for the 'cpu_user' AKS nodepool."
 }
