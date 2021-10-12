@@ -10,7 +10,7 @@ daskhub:
             image: "${python_image}"
             cpu_guarantee: 3.6
             cpu_limit: 4
-            mem_guarantee: "28G"
+            mem_guarantee: "27G"
             mem_limit: "32G"
             default_url: "/lab/tree/PlanetaryComputerExamples/README.md"
             node_affinity_required:
