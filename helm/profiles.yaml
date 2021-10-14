@@ -41,7 +41,7 @@ daskhub:
         - display_name: "GPU - PyTorch"
           description: '4 cores, 28 GiB of memory, <a href="https://docs.microsoft.com/en-us/azure/virtual-machines/nct4-v3-series">T4 GPU</a>. This has a longer startup time.'
           kubespawner_override:
-            cpu_guarantee: 3.5
+            cpu_guarantee: 3.0
             cpu_limit: 4
             image: "${gpu_pytorch_image}"
             mem_limit: "27G"
@@ -68,7 +68,7 @@ daskhub:
         - display_name: "GPU - Tensorflow"
           description: '4 cores, 28 GiB of memory, <a href="https://docs.microsoft.com/en-us/azure/virtual-machines/nct4-v3-series">T4 GPU</a>. This has a longer startup time.'
           kubespawner_override:
-            cpu_guarantee: 3.5
+            cpu_guarantee: 3.0
             cpu_limit: 4
             image: "${gpu_tensorflow_image}"
             mem_limit: "27G"
