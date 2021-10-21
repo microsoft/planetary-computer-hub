@@ -26,7 +26,7 @@ module "resources" {
   gpu_pytorch_image                = "pcccr.azurecr.io/public/planetary-computer/gpu-pytorch:2021.09.28.0"
   gpu_tensorflow_image             = "pcccr.azurecr.io/public/planetary-computer/gpu-tensorflow:2021.10.01.11"
   qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:3.18.0"
-
+  kbatch_server_url                = "http://kbatch-server.staging.svc.cluster.local"
 }
 
 terraform {

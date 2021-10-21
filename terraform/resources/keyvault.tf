@@ -26,3 +26,9 @@ data "azurerm_key_vault_secret" "azure_client_secret" {
   name         = "${local.stack_id}--azure-client-secret"
   key_vault_id = data.azurerm_key_vault.deploy_secrets.id
 }
+
+# kbatch integration
+data "azurerm_key_vault_secret" "kbatch_server_api_token" {
+  name         = "${local.namespaced_prefix}--kbatch-server-api-token"
+  key_vault_id = data.azurerm_key_vault.deploy_secrets.id
+}

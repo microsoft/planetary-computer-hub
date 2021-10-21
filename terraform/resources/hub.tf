@@ -119,4 +119,14 @@ resource "helm_release" "dhub" {
     value = "${var.dns_label}-dask"
   }
 
+  set {
+    name  = "daskhub.jupyterhub.hub.services.kbatch.api_token"
+    value = data.azurerm_key_vault_secret.kbatch_server_api_token.value
+  }
+
+  set {
+    name  = "daskhub.jupyterhub.hub.services.kbatch.url"
+    value = var.kbatch_server_url
+  }
+
 }
