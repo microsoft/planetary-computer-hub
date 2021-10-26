@@ -110,6 +110,19 @@ $ az keyvault secret set --vault-name pc-deploy-secrets --name '<prefix>--<key-n
 This repository deploys on commits to the staging environment on commits `main`. We commit to production on tags.
 The deployment is done through GitHub Actions.
 
+We created a service principal to mange deployment.
+
+To enable creating network security groups
+
+```
+$ az role assignment create \
+    --role "/subscriptions/<subscription-id>/providers/Microsoft.Authorization/roleDefinitions/4d97b98b-1d4f-4787-a291-c67834d212e7" \
+    --assginee "<service-principal-id>" \
+    --scope="/subscriptions/<subscription-id>/resourceGroups/MC_pcc-staging-rg_pcc-staging-cluster_westeurope/providers/Microsoft.Network/routeTables/aks-agentpool-27180469-routetable"
+```
+
+Likewise for production (change the resource group name in the scope).
+
 ## Opencensus monitor service
 
 `jupyterhub_opencensus_monitory.py` module is deployed as a [JuptyerHub service][hub-service]. It collects metrics on usage from the JupyterHub REST API. It would ideally be refactored into a standalone repository: <https://github.com/jupyterhub/jupyterhub/issues/3116>.
