@@ -104,6 +104,9 @@ $ az keyvault secret set --vault-name pc-deploy-secrets --name '<prefix>--<key-n
 | pcc--id-client-secret                      | Sets `daskhub.jupyterhub.hub.config.GenericOAuthenticator.client_secret`, an Oauth token to communicate with the pc-id oauth provider                         |
 | pcc--pc-id-token                           | Sets `daskhub.jupyterhub.hub.extraEnv.PC_ID_TOKEN`, an API token with the pc-id application to look up users, enabling the API management integration         |
 | pcc--azure-client-secret                   | Sets `daskhub.jupyterhub.hub.extraEnv.AZURE_CLIENT_SECRET`, an secret key to allow the hub to access Azure resources, enabling the API management integration |
+| pcc-staging--kbatch-server-api-token       | JupyterHub token for the kbatch application in staging.                                                                                                       |
+| pcc-prod--kbatch-server-api-token          | JupyterHub token for the kbatch application in production.                                                                                                    |
+
 
 ## Continuous deployment
 

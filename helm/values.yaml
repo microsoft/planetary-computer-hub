@@ -60,6 +60,9 @@ daskhub:
             - python3
             - /usr/local/jupyterhub_opencensus_monitor.py
           admin: true
+        kbatch:
+          # api_token and URL are set by terraform
+          admin: true
 
       # Volumes for customizing the JupyterHub UI
       # https://discourse.jupyter.org/t/customizing-jupyterhub-on-kubernetes/1769/4
