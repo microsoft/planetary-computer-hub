@@ -5,6 +5,8 @@
 
 This repository contains the configuration and continuous deployment for the [Planetary Computer's Hub][hub], a [Dask-Gateway][gateway] enabled [JupyterHub][jupyterhub] deployment focused on supporting scalable geospatial analysis.
 
+For general questions or discussions about the Planetary Computer, use the [microsoft/PlanetaryComputer](http://github.com/microsoft/PlanetaryComputer) repository.
+
 ## Overview
 
 See the [user documentation][hub] for an overview of what all is provided.
