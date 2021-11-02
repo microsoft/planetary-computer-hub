@@ -126,7 +126,7 @@ resource "helm_release" "dhub" {
 
   set {
     name  = "daskhub.jupyterhub.hub.services.kbatch.url"
-    value = var.kbatch_server_url
+    value = var.kbatch_proxy_url
   }
 
 }
