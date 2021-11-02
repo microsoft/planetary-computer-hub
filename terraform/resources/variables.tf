@@ -131,7 +131,7 @@ variable "user_placeholder_replicas" {
   description = "The number of User placeholder replicas for JupyterHub (see https://zero-to-jupyterhub.readthedocs.io/en/latest/administrator/optimization.html#scaling-up-in-time-user-placeholders)."
 }
 
-variable "kbatch_server_url" {
+variable "kbatch_proxy_url" {
   type        = string
   description = "URL (possibly kubernetes-internal) to the kbatch-server application."
 }
