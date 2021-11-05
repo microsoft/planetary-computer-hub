@@ -1,0 +1,14 @@
+kbatch-proxy:
+  app:
+    # jupyterhub_api_token, jupyterhub_api_url set by terraform
+    extra_env:
+      KBATCH_PREFIX: "/compute/services/kbatch"
+      KBATCH_JOB_EXTRA_ENV: |
+        {
+          "DASK_GATEWAY__AUTH__TYPE": "jupyterhub",
+          "DASK_GATEWAY__CLUSTER__OPTIONS__IMAGE": "{JUPYTER_IMAGE_SPEC}",
+          "DASK_GATEWAY__ADDRESS":  "https://${jupyterhub_host}/compute/services/dask-gateway",
+          "DASK_GATEWAY__PROXY_ADDRESS": "gateway://${dns_label}-dask.westeurope.cloudapp.azure.com:80"
+        }
+  image:
+    tag: "0.1.11"
