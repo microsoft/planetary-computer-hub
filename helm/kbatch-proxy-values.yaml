@@ -3,6 +3,7 @@ kbatch-proxy:
     # jupyterhub_api_token, jupyterhub_api_url set by terraform
     extra_env:
       KBATCH_PREFIX: "/compute/services/kbatch"
+      KBATCH_JOB_TTL_SECONDS_AFTER_FINISHED: 86400
       KBATCH_JOB_EXTRA_ENV: |
         {
           "DASK_GATEWAY__AUTH__TYPE": "jupyterhub",
