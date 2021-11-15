@@ -169,9 +169,22 @@ daskhub:
             configMap:
               name: user-etc-singleuser
 
+          # Workaround small /dev/shm issue.
+          # https://github.com/pangeo-data/pangeo-docker-images/issues/258
+          # https://stackoverflow.com/questions/46085748/define-size-for-dev-shm-on-container-engine/46434614#46434614
+          # This can be fixed upstream in planetary-computer-containers once the docker GitHub action
+          # is updated to support setting shm-size.
+          # https://github.com/docker/build-push-action/issues/263
+          - name: dshm
+            emptyDir:
+              medium: Memory
+
         extraVolumeMounts:
           - name: user-etc-singleuser
             mountPath: /etc/singleuser
+
+          - mountPath: /dev/shm
+            name: dshm
 
       extraEnv:
         DASK_GATEWAY__CLUSTER__OPTIONS__IMAGE: '{JUPYTER_IMAGE_SPEC}'
