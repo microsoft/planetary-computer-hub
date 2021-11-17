@@ -12,4 +12,4 @@ kbatch-proxy:
           "DASK_GATEWAY__PROXY_ADDRESS": "gateway://${dns_label}-dask.westeurope.cloudapp.azure.com:80"
         }
   image:
-    tag: "0.1.11"
+    tag: "0.2.7"
