@@ -4,6 +4,7 @@ kbatch-proxy:
     extra_env:
       KBATCH_PREFIX: "/compute/services/kbatch"
       KBATCH_JOB_TTL_SECONDS_AFTER_FINISHED: 86400
+      KBATCH_JOB_TEMPLATE: /job-template.yaml
       KBATCH_JOB_EXTRA_ENV: |
         {
           "DASK_GATEWAY__AUTH__TYPE": "jupyterhub",
@@ -11,5 +12,25 @@ kbatch-proxy:
           "DASK_GATEWAY__ADDRESS":  "https://${jupyterhub_host}/compute/services/dask-gateway",
           "DASK_GATEWAY__PROXY_ADDRESS": "gateway://${dns_label}-dask.westeurope.cloudapp.azure.com:80"
         }
+    extraFiles:
+      job_template:
+        mountPath: /job-template.yaml
+        data:
+          apiVersion: batch/v1
+          kind: Job
+          spec:
+            template:
+              spec:
+                affinity:
+                  nodeAffinity:
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                      nodeSelectorTerms:
+                        - matchExpressions:
+                          - key: hub.jupyter.org/node-purpose
+                            operator: In
+                            values:
+                              - user
+
+    extraVolumeMounts: {}
   image:
-    tag: "0.1.11"
+    tag: "0.2.7"
