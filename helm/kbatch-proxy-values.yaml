@@ -41,7 +41,7 @@ kbatch-proxy:
                             operator: In
                             values:
                               - user
-            backoffLimit: 0
+            backoffLimit: 1
 
 resources:
   limits:
