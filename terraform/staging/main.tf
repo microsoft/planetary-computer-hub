@@ -23,8 +23,8 @@ module "resources" {
   jupyterhub_singleuser_image_tag  = "2021.11.22.0"
   python_image                     = "pcccr.azurecr.io/public/planetary-computer/python:2021.11.22.0"
   r_image                          = "pcccr.azurecr.io/public/planetary-computer/r:2021.11.04.0"
-  gpu_pytorch_image                = "pcccr.azurecr.io/public/planetary-computer/gpu-pytorch:2021.09.28.0"
-  gpu_tensorflow_image             = "pcccr.azurecr.io/public/planetary-computer/gpu-tensorflow:2021.10.01.11"
+  gpu_pytorch_image                = "pcccr.azurecr.io/public/planetary-computer/gpu-pytorch:2021.11.22.1"
+  gpu_tensorflow_image             = "pcccr.azurecr.io/public/planetary-computer/gpu-tensorflow:2021.11.22.1"
   qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:3.18.0"
   kbatch_proxy_url                 = "http://dhub-staging-kbatch-proxy.staging.svc.cluster.local"
 }
