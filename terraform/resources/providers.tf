@@ -12,6 +12,14 @@ provider "helm" {
   }
 }
 
+provider "kubernetes" {
+  host                   = azurerm_kubernetes_cluster.pc_compute.kube_config[0].host
+  client_key             = base64decode(azurerm_kubernetes_cluster.pc_compute.kube_config[0].client_key)
+  client_certificate     = base64decode(azurerm_kubernetes_cluster.pc_compute.kube_config[0].client_certificate)
+  cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.pc_compute.kube_config[0].cluster_ca_certificate)
+}
+
+
 terraform {
   required_version = ">= 1.0.0"
 
@@ -25,5 +33,11 @@ terraform {
       source  = "hashicorp/random"
       version = "3.0.0"
     }
+
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "2.6.1"
+    }
+
   }
 }

@@ -73,6 +73,7 @@ daskhub:
         - name: hub-external
           configMap:
             name: hub-external
+
       extraVolumeMounts:
         - name: hub-templates
           mountPath: /etc/jupyterhub/templates
@@ -179,12 +180,21 @@ daskhub:
             emptyDir:
               medium: Memory
 
+          - name: driven-data
+            azureFile:
+              secretName: driven-data-file-share
+              shareName: driven-data
+              readOnly: true
+
         extraVolumeMounts:
           - name: user-etc-singleuser
             mountPath: /etc/singleuser
 
-          - mountPath: /dev/shm
-            name: dshm
+          - name: dshm
+            mountPath: /dev/shm
+
+          - name: driven-data
+            mountPath: /driven-data/
 
       extraEnv:
         DASK_GATEWAY__CLUSTER__OPTIONS__IMAGE: '{JUPYTER_IMAGE_SPEC}'
