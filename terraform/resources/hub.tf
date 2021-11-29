@@ -144,4 +144,8 @@ resource "helm_release" "dhub" {
     value = "https://${var.jupyterhub_host}/compute/hub/api/"
   }
 
+  # depends_on = [
+  #   kubernetes_persistent_volume_claim.test-data-shared
+  # ]
+
 }

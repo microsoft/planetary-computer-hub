@@ -83,6 +83,11 @@ Defines the variables that can be controlled by the staging / prod deployments. 
 
 Creates the [Azure Virtual Network](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-overview) used by the Kubernetes Cluster.
 
+### data-volumes.tf
+
+Creates an Azure Storage Account, File share, and Kubernetes Secret for mounting the file share. This is used to mount read-only, static files into all the user
+pods (e.g. a dataset for a machine learning competition).
+
 ## Manual Resources
 
 We rely on a few "manual" resources that are created outside of this repository. These include
