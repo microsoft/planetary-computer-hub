@@ -15,18 +15,18 @@ module "resources" {
   workspace_id = "225cedbd199c55da"
 
   # DaskHub ------------------------------------------------------------------
-  dns_label                        = "pccompute"
-  jupyterhub_host                  = "pccompute.westeurope.cloudapp.azure.com"
-  user_placeholder_replicas        = 1
-  stac_url                         = "https://planetarycomputer.microsoft.com/api/stac/v1/"
-  jupyterhub_singleuser_image_name = "pcccr.azurecr.io/public/planetary-computer/python"
-  jupyterhub_singleuser_image_tag  = "2021.11.22.0"
+  dns_label                 = "pccompute"
+  jupyterhub_host           = "pccompute.westeurope.cloudapp.azure.com"
+  user_placeholder_replicas = 1
+  stac_url                  = "https://planetarycomputer.microsoft.com/api/stac/v1/"
 
-  python_image         = "pcccr.azurecr.io/public/planetary-computer/python:2021.11.29.0"
-  r_image              = "pcccr.azurecr.io/public/planetary-computer/r:2021.11.19.0"
-  gpu_pytorch_image    = "pcccr.azurecr.io/public/planetary-computer/gpu-pytorch:2021.11.29.0"
-  gpu_tensorflow_image = "pcccr.azurecr.io/public/planetary-computer/gpu-tensorflow:2021.11.29.0"
-  qgis_image           = "pcccr.azurecr.io/planetary-computer/qgis:3.18.0"
+  jupyterhub_singleuser_image_name = "pcccr.azurecr.io/public/planetary-computer/python"
+  jupyterhub_singleuser_image_tag  = "2021.11.30.0"
+  python_image                     = "pcccr.azurecr.io/public/planetary-computer/python:2021.11.30.0"
+  r_image                          = "pcccr.azurecr.io/public/planetary-computer/r:2021.11.19.0"
+  gpu_pytorch_image                = "pcccr.azurecr.io/public/planetary-computer/gpu-pytorch:2021.11.30.0"
+  gpu_tensorflow_image             = "pcccr.azurecr.io/public/planetary-computer/gpu-tensorflow:2021.11.30.0"
+  qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:3.18.0"
 
   kbatch_proxy_url = "http://dhub-prod-kbatch-proxy.prod.svc.cluster.local"
 }
