@@ -184,6 +184,7 @@ daskhub:
           - name: driven-data
             azureFile:
               secretName: driven-data-file-share
+              secretNamespace: ${namespace}
               shareName: driven-data
               readOnly: true
 
