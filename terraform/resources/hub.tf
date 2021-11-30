@@ -161,3 +161,18 @@ resource "kubernetes_secret" "pc-compute-fileshare" {
     azurestorageaccountkey  = data.azurerm_storage_account.pc-compute.primary_access_key
   }
 }
+
+
+# Also put it in the default namespace
+# Our prod cluster seems to be having trouble getting the secret from
+# the prod namespace; possibly becuase it's on an older version of Kubernetes.
+resource "kubernetes_secret" "pc-compute-fileshare-default" {
+  metadata {
+    name = "driven-data-file-share"
+  }
+
+  data = {
+    azurestorageaccountname = data.azurerm_storage_account.pc-compute.name
+    azurestorageaccountkey  = data.azurerm_storage_account.pc-compute.primary_access_key
+  }
+}
