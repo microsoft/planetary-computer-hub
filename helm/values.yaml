@@ -21,7 +21,7 @@ daskhub:
 
       config:
         JupyterHub:
-          admin_access: true
+          admin_access: false
           admin_users:
             - taugspurger@microsoft.com
 
