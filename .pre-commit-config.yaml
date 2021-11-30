@@ -19,7 +19,7 @@ repos:
     - id: check_images
       name: check_images
       entry: ./scripts/check-images
-      files: "terraform/.*/main.tf"
+      files: "terraform/(staging|prod)/main.tf"
 
       language: python
       additional_dependencies:

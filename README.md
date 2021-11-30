@@ -34,7 +34,9 @@ Finally, the custom UI elements used by the Hub process and additional notebook 
 
 The `terraform` directory contains all the deployment code for the Hub. It manages the Azure resources and Helm release.
 
-The terraform code is split into deployment-specific directories (`prod`, `staging`) and a `common` directory that contains the shared configuration between the two deployments. To the extent possible, resources should be defined in `common`. `staging` and `prod` should only contain configuration (e.g. the URL for the hub, or the size of the core VM).
+The terraform code is split into deployment-specific directories (`prod`, `staging`) and a `resources` directory that contains the shared configuration between the two deployments. To the extent possible, resources should be defined in `resources`. `staging` and `prod` should only contain configuration (e.g. the URL for the hub, or the size of the core VM).
+
+Additionally, there's a `shared` directory, which contains the definition for resources that are shared between the two. Currently, this includes a Storage Account and file share for mounting data volumes onto notebook pods. Resources in the `shared` directory are deployed manually.
 
 ### acr.tf
 
