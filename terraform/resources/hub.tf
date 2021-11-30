@@ -9,7 +9,6 @@ resource "random_password" "dask_gateway_api_token" {
   upper   = false
 }
 
-
 resource "helm_release" "dhub" {
   name             = "dhub-${var.environment}"
   repository       = "./charts/pchub"
@@ -144,8 +143,21 @@ resource "helm_release" "dhub" {
     value = "https://${var.jupyterhub_host}/compute/hub/api/"
   }
 
-  # depends_on = [
-  #   kubernetes_persistent_volume_claim.test-data-shared
-  # ]
+}
 
+data "azurerm_storage_account" "pc-compute" {
+  name                = "${replace(local.prefix, "-", "")}storage"
+  resource_group_name = "${local.prefix}-shared-rg"
+}
+
+resource "kubernetes_secret" "pc-compute-fileshare" {
+  metadata {
+    name      = "driven-data-file-share"
+    namespace = var.environment
+  }
+
+  data = {
+    azurestorageaccountname = data.azurerm_storage_account.pc-compute.name
+    azurestorageaccountkey  = data.azurerm_storage_account.pc-compute.primary_access_key
+  }
 }
