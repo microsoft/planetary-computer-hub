@@ -81,34 +81,6 @@ daskhub:
           mountPath: /usr/local/share/jupyterhub/static/external
 
       extraConfig:
-        00-spawner-class: |
-          # Custom spawner class to log the duration of the singleuser session
-          import datetime
-          import logging
-
-          from opencensus.ext.azure.log_exporter import AzureLogHandler
-          from kubespawner import KubeSpawner
-
-          logger = logging.getLogger("pc_metrics")
-          handler = AzureLogHandler()
-          handler.setLevel(logging.INFO)
-          logger.setLevel(logging.INFO)
-          logger.addHandler(handler)
-
-          class MyKubeSpawner(KubeSpawner):
-              async def stop(self, now=False):
-                  try:
-                      pod = await self.asynchronize(self.api.read_namespaced_pod, name=self.pod_name, namespace=self.namespace)
-                      now = datetime.datetime.now(datetime.timezone.utc)
-                      duration = int((now -pod.status.start_time).total_seconds())
-                      logger.info("singleuser stop", extra={"custom_dimensions": {"duration": duration}})
-                  except Exception:
-                      logger.exception("Failed to compute pod duration")
-
-                  return await super().stop(now=now)
-
-          c.JupyterHub.spawner_class = MyKubeSpawner
-
         mylabels: |
           c.KubeSpawner.extra_labels = {}
         kubespawner: |
