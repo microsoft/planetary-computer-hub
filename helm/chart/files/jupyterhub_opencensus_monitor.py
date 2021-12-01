@@ -2,12 +2,15 @@
 Opencensus monitor for JupyterHub as a JupyterHub service.
 """
 import asyncio
+import datetime
 import logging
+from typing import Dict, List
 import os
 from collections import Counter, defaultdict
 
 import httpx
 from opencensus.ext.azure import metrics_exporter
+from opencensus.ext.azure.log_exporter import AzureLogHandler
 import opencensus.stats.aggregation
 import opencensus.stats.view
 import opencensus.stats.stats
@@ -16,10 +19,21 @@ import opencensus.tags.tag_map
 
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+handler.setLevel(logging.INFO)
+logger.addHandler(handler)
 
+azlogger = logging.getLogger("pc_metrics")
+azlogger.setLevel(logging.INFO)
+handler = AzureLogHandler()
+handler.setLevel(logging.INFO)
+azlogger.addHandler(handler)
+
+DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 __version__ = "0.1.0"
-INTERVAL = 60  # seconds
+INTERVAL = 5  # seconds
 
 # ---- Metrics configuration ----
 # We collect / record by counts by profile, so create one TagMap per profile.
@@ -61,6 +75,29 @@ def count_notebook_servers(data: list):
     return server_count
 
 
+def compute_durations(users_start_times: Dict[str, datetime.datetime], data: list) -> List[int]:
+    current_users = {user["name"] for user in data}
+    previous_users = set(users_start_times)
+    dropped_users = previous_users - current_users
+    new_users = current_users - previous_users
+
+    now = datetime.datetime.utcnow()
+    durations = []
+
+    for user in dropped_users:
+        start_time = users_start_times.pop(user)  # mutates in place!
+        duration = now - start_time
+        durations.append(int(duration.total_seconds()))
+
+    for user in data:
+        if user["name"] in new_users:
+            # assumes no named servers
+            server = user["servers"][""]
+            users_start_times[user["name"]] = datetime.datetime.strptime(server["started"], DATE_FORMAT) 
+
+    return durations
+
+
 async def main():
 
     JUPYTERHUB_API_TOKEN = os.environ["JUPYTERHUB_API_TOKEN"]
@@ -79,6 +116,8 @@ async def main():
             response.json()["version"],
         )
 
+        users_start_times: Dict[str, datetime.datetime] = {}
+
         while True:
             response = await client.get(
                 f"{JUPYTERHUB_API_URL}/users?state=active", headers=headers
@@ -91,6 +130,11 @@ async def main():
                 tag_map.insert("environment", JUPYTERHUB_ENVIRONMENT)
                 measurement_map.measure_int_put(server_count_measure, count)
                 measurement_map.record(tag_map)
+
+            durations = compute_durations(users_start_times, data)
+            print("got durations", durations)
+            for duration in durations:
+                azlogger.info("duration %d", duration, extra={"custom_dimensions": {"duration": duration}})
 
             logger.debug("Sleeping for %d", INTERVAL)
             await asyncio.sleep(INTERVAL)

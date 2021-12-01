@@ -8,7 +8,7 @@ module "resources" {
   kubernetes_version = "1.21.2"
   # 2GiB of RAM, 1 CPU core
   core_vm_size              = "Standard_A2_v2"
-  user_pool_min_count       = 1
+  user_pool_min_count       = 0
   cpu_worker_pool_min_count = 0
 
   # Logs ---------------------------------------------------------------------
