@@ -24,6 +24,7 @@ daskhub:
 
             logger = logging.getLogger(__name__)
 
+
             __version__ = "0.1.0"
             INTERVAL = 60  # seconds
 
@@ -104,3 +105,4 @@ daskhub:
 
             if __name__ == "__main__":
                 asyncio.run(main())
+
