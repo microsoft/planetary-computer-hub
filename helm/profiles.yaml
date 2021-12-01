@@ -8,9 +8,9 @@ daskhub:
           description: '4 cores, 32 GiB of memory. <a href="https://github.com/pangeo-data/pangeo-docker-images">Pangeo Notebook</a> environment.'
           kubespawner_override:
             image: "${python_image}"
-            cpu_guarantee: 3.6
+            cpu_guarantee: 3
             cpu_limit: 4
-            mem_guarantee: "27G"
+            mem_guarantee: "25G"
             mem_limit: "32G"
             default_url: "/lab/tree/PlanetaryComputerExamples/README.md"
             node_affinity_required:
