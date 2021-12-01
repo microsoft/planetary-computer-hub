@@ -132,7 +132,7 @@ async def main():
                 measurement_map.record(tag_map)
 
             durations = compute_durations(users_start_times, data)
-            print("got durations", durations)
+
             for duration in durations:
                 azlogger.info("duration %d", duration, extra={"custom_dimensions": {"duration": duration}})
 
