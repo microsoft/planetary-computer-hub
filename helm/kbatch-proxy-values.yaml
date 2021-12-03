@@ -43,8 +43,7 @@ kbatch-proxy:
                             values:
                               - user
             backoffLimit: 1
-
-      job_template:
+      profile_template:
         mountPath: /profile-template.yaml
         data:
           python:
