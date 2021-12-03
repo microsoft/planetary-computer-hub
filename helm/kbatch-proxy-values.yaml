@@ -6,6 +6,7 @@ kbatch-proxy:
     extra_env:
       KBATCH_PREFIX: "/compute/services/kbatch"
       KBATCH_JOB_TTL_SECONDS_AFTER_FINISHED: 86400
+      KBATCH_PROFILE_FILE: /profile-template.yaml
       KBATCH_JOB_TEMPLATE_FILE: /job-template.yaml
       KBATCH_JOB_EXTRA_ENV: |
         {
@@ -42,6 +43,80 @@ kbatch-proxy:
                             values:
                               - user
             backoffLimit: 1
+
+      job_template:
+        mountPath: /profile-template.yaml
+        data:
+          python:
+            image: mcr.microsoft.com/planetary-computer/python:2021.11.30.0
+            resources:
+              requests:
+                cpu: "3.6"
+                memory: "27G"
+              limits:
+                cpu: "4"
+                memory: "32G"
+          r:
+            image: mcr.microsoft.com/planetary-computer/r:2021.11.19.0
+            resources:
+              requests:
+                cpu: "7.0"
+                memory: "54G"
+              limits:
+                cpu: "8"
+                memory: "59G"
+          gpu-pytorch:
+            image: mcr.microsoft.com/planetary-computer/gpu-pytorch:2021.12.02.1
+            resources:
+              requests:
+                cpu: "3.0"
+                memory: "20G"
+                nvidia.com/gpu: "1"
+              limits:
+                cpu: "4.0"
+                memory: "27G"
+                nvidia.com/gpu: "1"
+            tolerations:
+              - key: 'nvidia.com/gpu'
+                operator: 'Equal'
+                value: 'present'
+                effect: 'NoSchedule'
+              - key: 'hub.jupyter.org_dedicated'
+                operator: 'Equal'
+                value: 'user'
+                effect: 'NoSchedule'
+            node_affinity_required:
+              - matchExpressions:
+                - key: pc.microsoft.com/userkind
+                  operator: In
+                  values:
+                  - gpu
+          gpu-tensorflow:
+            image: mcr.microsoft.com/planetary-computer/gpu-tensorflow:2021.11.30.0
+            resources:
+              requests:
+                cpu: "3.0"
+                memory: "20G"
+                nvidia.com/gpu: "1"
+              limits:
+                cpu: "4.0"
+                memory: "27G"
+                nvidia.com/gpu: "1"
+            tolerations:
+              - key: 'nvidia.com/gpu'
+                operator: 'Equal'
+                value: 'present'
+                effect: 'NoSchedule'
+              - key: 'hub.jupyter.org_dedicated'
+                operator: 'Equal'
+                value: 'user'
+                effect: 'NoSchedule'
+            node_affinity_required:
+              - matchExpressions:
+                - key: pc.microsoft.com/userkind
+                  operator: In
+                  values:
+                  - gpu 
 
 resources:
   limits:
