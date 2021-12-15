@@ -21,11 +21,11 @@ module "resources" {
   stac_url                  = "https://planetarycomputer-staging.microsoft.com/api/stac/v1/"
 
   jupyterhub_singleuser_image_name = "pcccr.azurecr.io/public/planetary-computer/python"
-  jupyterhub_singleuser_image_tag  = "2021.11.30.0"
-  python_image                     = "pcccr.azurecr.io/public/planetary-computer/python:2021.11.30.0"
+  jupyterhub_singleuser_image_tag  = "2021.12.15.0"
+  python_image                     = "pcccr.azurecr.io/public/planetary-computer/python:2021.12.15.0"
   r_image                          = "pcccr.azurecr.io/public/planetary-computer/r:2021.11.19.0"
-  gpu_pytorch_image                = "pcccr.azurecr.io/public/planetary-computer/gpu-pytorch:2021.12.02.1"
-  gpu_tensorflow_image             = "pcccr.azurecr.io/public/planetary-computer/gpu-tensorflow:2021.11.30.0"
+  gpu_pytorch_image                = "pcccr.azurecr.io/public/planetary-computer/gpu-pytorch:2021.12.15.0"
+  gpu_tensorflow_image             = "pcccr.azurecr.io/public/planetary-computer/gpu-tensorflow:2021.12.15.0"
   qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:3.18.0"
 
   kbatch_proxy_url = "http://dhub-staging-kbatch-proxy.staging.svc.cluster.local"
