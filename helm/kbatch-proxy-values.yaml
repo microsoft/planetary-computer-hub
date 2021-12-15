@@ -42,7 +42,7 @@ kbatch-proxy:
                             operator: In
                             values:
                               - user
-            backoffLimit: 1
+            backoffLimit: 0
       profile_template:
         mountPath: /profile-template.yaml
         data:
