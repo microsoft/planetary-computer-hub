@@ -7,4 +7,6 @@ trigger:
       - "*"
 
 stages:
-  - stage: azure-pipelines
+  - stage: azure_pipelines
+    jobs:
+      - job: empty_job
