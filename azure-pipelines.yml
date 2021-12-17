@@ -5,3 +5,6 @@ trigger:
   tags:
     include:
       - "*"
+
+stages:
+  - stage: azure-pipelines
