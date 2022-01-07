@@ -46,6 +46,11 @@ variable "python_image" {
   description = "The tag for the python environment image."
 }
 
+variable "pyspark_image" {
+  type        = string
+  description = "The tag for the PySpark environment image."
+}
+
 variable "r_image" {
   type        = string
   description = "The tag for the R environment image."
@@ -108,6 +113,12 @@ variable "cpu_worker_max_count" {
 variable "workspace_id" {
   type        = string
   description = "A random (unique) string to use for the Log Analystics workspace."
+}
+
+variable "enable_role_based_access_control" {
+  type        = bool
+  default     = true
+  description = "Enable Role Based Access Control."
 }
 
 # ----------------------------------------------------------------------------

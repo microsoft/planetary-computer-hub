@@ -23,6 +23,7 @@ module "resources" {
   jupyterhub_singleuser_image_name = "pcccr.azurecr.io/public/planetary-computer/python"
   jupyterhub_singleuser_image_tag  = "2022.01.17.0"
   python_image                     = "pcccr.azurecr.io/public/planetary-computer/python:2022.01.17.0"
+  pyspark_image                    = "daunnc/planetary-computer-pyspark:2021.11.29.0-gdal3.4-3.1-rf"
   r_image                          = "pcccr.azurecr.io/public/planetary-computer/r:2022.01.17.0"
   gpu_pytorch_image                = "pcccr.azurecr.io/public/planetary-computer/gpu-pytorch:2022.01.17.0"
   gpu_tensorflow_image             = "pcccr.azurecr.io/public/planetary-computer/gpu-tensorflow:2022.01.17.0"
