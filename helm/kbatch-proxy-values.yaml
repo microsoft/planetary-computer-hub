@@ -1,6 +1,6 @@
 kbatch-proxy:
   image:
-    tag: "0.2.11"
+    tag: "0.2.14"
   app:
     # jupyterhub_api_token, jupyterhub_api_url set by terraform
     extra_env:
