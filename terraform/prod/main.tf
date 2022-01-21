@@ -26,7 +26,7 @@ module "resources" {
   r_image                          = "pcccr.azurecr.io/public/planetary-computer/r:2022.01.17.0"
   gpu_pytorch_image                = "pcccr.azurecr.io/public/planetary-computer/gpu-pytorch:2022.01.17.0"
   gpu_tensorflow_image             = "pcccr.azurecr.io/public/planetary-computer/gpu-tensorflow:2022.01.17.0"
-  qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:3.18.0"
+  qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:3.18.0.1"
 
   kbatch_proxy_url = "http://dhub-prod-kbatch-proxy.prod.svc.cluster.local"
 }
