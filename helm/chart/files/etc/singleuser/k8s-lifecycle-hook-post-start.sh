@@ -42,7 +42,7 @@ EOF
 # The docker image puts the plugin files in /opt/conda/share
 # We move them into the home directory, if the plugin isn't already installed
 echo "[Adding QGIS STAC plugin]"
-mkdir -p $HOME/.local/share/QGIS/QGIS3/profiles/default/python/plugines
+mkdir -p $HOME/.local/share/QGIS/QGIS3/profiles/default/python/plugins
 
 if [ -d /opt/conda/share/qgis_stac ]; then
     mv -n /opt/conda/share/qgis_stac $HOME/.local/share/QGIS/QGIS3/profiles/default/python/plugins/
