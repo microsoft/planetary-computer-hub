@@ -156,7 +156,7 @@ daskhub:
                 'spark.kubernetes.authenticate.driver.serviceAccountName': 'default',
                 'spark.kubernetes.authenticate.caCertFile': '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt',
                 'spark.kubernetes.authenticate.oauthTokenFile': '/var/run/secrets/kubernetes.io/serviceaccount/token',
-                'spark.kubernetes.executor.podTemplateFile': '/home/jovyan/executor-template.yml',
+                'spark.kubernetes.executor.podTemplateFile': '/etc/spark/executor-template.yml',
                 'spark.kubernetes.node.selector.k8s.spark.org/dedicated': 'worker',
                 'spark.kubernetes.node.selector.pc.microsoft.com/workerkind': 'spark-cpu',
                 'spark.kubernetes.node.selector.kubernetes.azure.com/scalesetpriority': 'spot'

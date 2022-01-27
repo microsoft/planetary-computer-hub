@@ -313,10 +313,10 @@ daskhub:
             mountPath: /driven-data/
 
       extraFiles:
-        spark_default_configuration:
-          mountPath: /home/jovyan/.ipython/profile_default/startup/00-spark-conf.py
         spark_executor_template:
-          mountPath: /home/jovyan/executor-template.yml
+          mountPath: /etc/spark/executor-template.yml
+        spark_default_configuration:
+          mountPath: /etc/spark-ipython/profile_default/startup/00-spark-conf.py
 
       extraEnv:
         DASK_GATEWAY__CLUSTER__OPTIONS__IMAGE: '{JUPYTER_IMAGE_SPEC}'
