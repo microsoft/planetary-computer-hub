@@ -85,10 +85,17 @@ daskhub:
           c.KubeSpawner.extra_labels = {}
         kubespawner: |
           c.KubeSpawner.start_timeout = 15 * 60  # 15 minutes
+          # pass the parent namespace through, needed for pre_spawn_hook to copy resources
+          c.KubeSpawner.environment['NAMESPACE_PARENT'] = c.KubeSpawner.namespace
+          # hub allocates notebook in user namespaces
+          c.KubeSpawner.enable_user_namespaces = True
+          # the hub url should be accessible across namespaces
+          c.KubeSpawner.hub_connect_url = "http://hub.${namespace}.svc.cluster.local:8081"
+
         01-add-dask-gateway-values: |
           # The daskhub helm chart doesn't correctly handle hub.baseUrl.
           # DASK_GATEWAY__PUBLIC_ADDRESS set via terraform
-          c.KubeSpawner.environment["DASK_GATEWAY__ADDRESS"] = "http://proxy-http:8000/compute/services/dask-gateway/"
+          c.KubeSpawner.environment["DASK_GATEWAY__ADDRESS"] = "http://proxy-http.${namespace}.svc.cluster.local:8000/compute/services/dask-gateway/"
           c.KubeSpawner.environment["DASK_GATEWAY__PUBLIC_ADDRESS"] = "https://${jupyterhub_host}/compute/services/dask-gateway/"
         templates: |
           c.JupyterHub.template_paths.insert(0, "/etc/jupyterhub/templates")
@@ -97,8 +104,97 @@ daskhub:
           # Sets the following
           # 1. environment variable PC_SDK_SUBSCRIPTION_KEY
           # ---------------------------------------------------
+          from kubernetes.client import RbacAuthorizationV1Api
+          from kubernetes.client.rest import ApiException
+          from kubernetes.client.models import V1Role, V1PolicyRule, V1ObjectMeta, V1Subject, V1RoleRef, V1RoleBinding, V1ServiceAccount
+
+          async def ensure_service_account_role(spawner, name, namespace, role_name): 
+              api = spawner.api
+              try:
+                  api.create_namespaced_service_account(namespace, V1ServiceAccount(metadata=V1ObjectMeta(name=name)))
+              except ApiException as e:
+                  if e.status != 409:
+                      # It's fine if it already exists
+                      spawner.log.exception(f'Failed to create service account {name} in the {namespace} namespace')
+                      raise
+              try:
+                  rules = [
+                    V1PolicyRule(
+                        [''], 
+                        resources=['pods', 'services', 'configmaps'], 
+                        verbs=['get', 'watch', 'list', 'create', 'delete', 'update']
+                    )
+                  ]
+                  role = V1Role(rules=rules)
+                  role.metadata = V1ObjectMeta(namespace=namespace, name=role_name)
+
+                  rbac = RbacAuthorizationV1Api()
+                  rbac.create_namespaced_role(namespace, role)
+              except ApiException as e:
+                  if e.status != 409:
+                      # It's fine if it already exists
+                      spawner.log.exception(f'Failed to create role {role} for service account {name} in the {namespace} namespace')
+                      raise
+              try:
+                  subject = V1Subject(kind='ServiceAccount', name=name, namespace=namespace)
+                  role_ref = V1RoleRef(api_group='rbac.authorization.k8s.io', kind='Role', name=role_name)
+                  metadata = V1ObjectMeta(name=f'{role_name}-binding')
+                  role_binding = V1RoleBinding(metadata=metadata, role_ref=role_ref, subjects=[subject])
+                  rbac = RbacAuthorizationV1Api()
+                  rbac.create_namespaced_role_binding(namespace=namespace, body=role_binding)
+              except ApiException as e:
+                  if e.status != 409:
+                      # It's fine if it already exists
+                      spawner.log.exception(f'Failed to create role binding for {role} and service account {name} in the {namespace} namespace')
+                      raise
 
           async def pre_spawn_hook(spawner):
+              spawner.environment['NAMESPACE_USER'] = spawner.namespace
+              namespace_parent = spawner.environment['NAMESPACE_PARENT']
+
+              # create user namespace before running the spawner
+              if spawner.enable_user_namespaces:
+                  await spawner._ensure_namespace()
+                  await ensure_service_account_role(spawner, 'default', spawner.namespace, 'default-role')
+
+              # copy secrets and configmaps into the new namespace
+              api = spawner.api
+              for s in api.list_namespaced_secret(namespace_parent).items:
+                  s.metadata.namespace = spawner.namespace
+                  s.metadata.resource_version = None
+                  try:
+                      api.create_namespaced_secret(spawner.namespace, s)
+                  except ApiException as e:
+                      if e.status != 409:
+                          # It's fine if it already exists
+                          spawner.log.exception(f'Failed to create namespace {spawner.namespace.namespace}, trying to patch...')
+                          api.patch_namespaced_secret(spawner.namespace, s)
+                          raise
+
+              for m in api.list_namespaced_config_map(namespace_parent).items:
+                  m.metadata.namespace = spawner.namespace
+                  m.metadata.resource_version = None
+                  try:
+                      api.create_namespaced_config_map(spawner.namespace, m)
+                  except ApiException as e:
+                      if e.status != 409:
+                          # It's fine if it already exists
+                          spawner.log.exception(f'Failed to create namespace {spawner.namespace.namespace}, trying to patch...')
+                          api.patch_namespaced_config_map(spawner.namespace, m)
+                          raise
+
+              # unmount spark default configuration with py env preload if not needed, for more details see
+              # https://github.com/jupyterhub/kubespawner/issues/501
+              # https://discourse.jupyter.org/t/tailoring-spawn-options-and-server-configuration-to-certain-users/8449
+              if spawner.user_options.get('profile', '') != 'pyspark':
+                  spawner.volume_mounts = list(filter(lambda e: 'spark' not in e.get('subPath', ''), spawner.volume_mounts))
+              # expose the Spark UI (needed only in the pyspark profile case)
+              else:
+                  spawner.extra_container_config = {'ports': [
+                      {'containerPort': 8888, 'name': 'notebook-port', 'protocol': 'TCP'},
+                      {'containerPort': 4040, 'name': 'spark-ui', 'protocol': 'TCP'}
+                  ]}
+
               username = spawner.user.name
               # `username` is an email address. We use that email address to look up the
               # user in the Django App
@@ -147,6 +243,21 @@ daskhub:
 
           c.KubeSpawner.pre_spawn_hook = pre_spawn_hook
 
+        # it is the spawner post stop hook, not related to the notebook lifecycle
+        # we don't need it
+        post_stop_hook: |
+          from kubernetes.client.rest import ApiException
+          async def post_stop_hook(spawner):
+              try:
+                  spawner.api.delete_namespace(spawner.namespace)
+              except ApiException as e:
+                  if e.status != 409:
+                      # It's fine if it is already removed
+                      spawner.log.exception(f'Failed to delete namespace {spawner.namespace.namespace}')
+                      raise
+
+          # c.KubeSpawner.post_stop_hook = post_stop_hook
+
     proxy:
       https:
         enabled: true
@@ -154,6 +265,9 @@ daskhub:
           contactEmail: "taugspurger@microsoft.com"
 
     singleuser:
+      # if not set, it also backs to default but with no ServiceAccount secrets mounted
+      serviceAccountName: default
+
       # These limits match the "large" profiles, so that a user requesting large will be successfully scheduled.
       # The user scheduler doesn't evict multiple placeholders.
       memory:
@@ -198,6 +312,12 @@ daskhub:
           - name: driven-data
             mountPath: /driven-data/
 
+      extraFiles:
+        spark_executor_template:
+          mountPath: /etc/spark/executor-template.yml
+        spark_default_configuration:
+          mountPath: /etc/spark-ipython/profile_default/startup/00-spark-conf.py
+
       extraEnv:
         DASK_GATEWAY__CLUSTER__OPTIONS__IMAGE: '{JUPYTER_IMAGE_SPEC}'
         DASK_DISTRIBUTED__DASHBOARD__LINK: '/user/{JUPYTERHUB_USER}/proxy/{port}/status'
@@ -222,7 +342,7 @@ daskhub:
       auth:
         jupyterhub:
           apiToken: "{{ tf.jupyterhub_dask_gateway_token }}"
-          apiUrl: http://proxy-http:8000/compute/hub/api
+          apiUrl: http://proxy-http.${namespace}.svc.cluster.local:8000/compute/hub/api
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

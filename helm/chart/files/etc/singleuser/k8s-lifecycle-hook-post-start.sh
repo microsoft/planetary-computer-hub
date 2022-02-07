@@ -48,6 +48,11 @@ Terminal=false
 Hidden=false
 EOF
 
+# Add Spark default configuration if mounted
+if [ -d "/etc/spark-ipython/profile_default/startup" ]; then
+    mkdir -p ~/.ipython/profile_default/startup/ && \
+    mv /etc/spark-ipython/profile_default/startup/* ~/.ipython/profile_default/startup/
+fi
 
 echo "Removing lost+found"
 # Remove empty lost+found directories

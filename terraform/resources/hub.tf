@@ -20,7 +20,7 @@ resource "helm_release" "dhub" {
   values = [
     "${templatefile("../../helm/values.yaml", { jupyterhub_host = var.jupyterhub_host, namespace = var.environment })}",
     "${file("../../helm/jupyterhub_opencensus_monitor.yaml")}",
-    "${templatefile("../../helm/profiles.yaml", { python_image = var.python_image, r_image = var.r_image, gpu_pytorch_image = var.gpu_pytorch_image, gpu_tensorflow_image = var.gpu_tensorflow_image, qgis_image = var.qgis_image })}",
+    "${templatefile("../../helm/profiles.yaml", { python_image = var.python_image, pyspark_image = var.pyspark_image, r_image = var.r_image, gpu_pytorch_image = var.gpu_pytorch_image, gpu_tensorflow_image = var.gpu_tensorflow_image, qgis_image = var.qgis_image })}",
     # workaround https://github.com/hashicorp/terraform-provider-helm/issues/669
     "${templatefile("../../helm/kbatch-proxy-values.yaml", { jupyterhub_host = var.jupyterhub_host, dns_label = var.dns_label })}",
   ]

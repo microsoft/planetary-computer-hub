@@ -5,6 +5,10 @@ resource "azurerm_kubernetes_cluster" "pc_compute" {
   dns_prefix          = "${local.maybe_staging_prefix}-cluster"
   kubernetes_version  = var.kubernetes_version
   sku_tier            = "Paid"
+  
+  role_based_access_control {
+    enabled = var.enable_role_based_access_control
+  }
 
   addon_profile {
     kube_dashboard {
@@ -105,6 +109,46 @@ resource "azurerm_kubernetes_cluster_node_pool" "cpu_worker_pool" {
   node_labels = {
     "k8s.dask.org/dedicated"                = "worker",
     "pc.microsoft.com/workerkind"           = "cpu",
+    "kubernetes.azure.com/scalesetpriority" = "spot"
+  }
+
+  node_taints = [
+    "kubernetes.azure.com/scalesetpriority=spot:NoSchedule",
+  ]
+
+  min_count = var.cpu_worker_pool_min_count
+  max_count = var.cpu_worker_max_count
+  tags = {
+    Environment = "Production"
+    ManagedBy   = "AI4E"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      node_count,
+    ]
+  }
+
+}
+
+# Spark supports pool with no taints and can select nodes via selector only by default
+# https://spark.apache.org/docs/latest/running-on-kubernetes.html#how-it-works
+# We use a non default spark-executors template to address this issue
+resource "azurerm_kubernetes_cluster_node_pool" "spark_cpu_worker_pool" {
+  name                  = "spcpuworker"
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.pc_compute.id
+  vm_size               = var.cpu_worker_vm_size
+  enable_auto_scaling   = true
+  os_disk_size_gb       = 128
+  orchestrator_version  = var.kubernetes_version
+  priority              = "Spot" # Regular when not set
+  eviction_policy       = "Delete"
+  spot_max_price        = -1
+  vnet_subnet_id        = azurerm_subnet.node_subnet.id
+
+  node_labels = {
+    "k8s.spark.org/dedicated"               = "worker",
+    "pc.microsoft.com/workerkind"           = "spark-cpu",
     "kubernetes.azure.com/scalesetpriority" = "spot"
   }
 

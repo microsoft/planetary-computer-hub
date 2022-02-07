@@ -28,7 +28,7 @@ The bulk of the configuration is done in `values.yaml`. See the inline comments 
 
 `jupyterhub_opencensus_monitor.yaml` sets `daskhub.jupyterhub.hub.extraFiles.jupyterhub_open_census_monitor.stringData` to be the `jupyterhub_opencensus_monitor.py` script (see below). We couldn't figure out out to get the helm-release provider working with with kubectl's `set-file` so we needed to inline the script. There's probably a better way to do this.
 
-Finally, the custom UI elements used by the Hub process and additional notebook server configuration are included under `helm/chart/files` and `helm/cart/templates`. These are mounted into the pods. See [custom UI](#custom-ui) for more.
+Finally, the custom UI elements used by the Hub process and additional notebook server configuration are included under `helm/chart/files` and `helm/chart/templates`. These are mounted into the pods. See [custom UI](#custom-ui) for more.
 
 ## Terraform
 
