@@ -30,9 +30,9 @@ daskhub:
           # oauth_callback_url, client_secret are set via terraform.
           client_id: "YRKd72gJAcBEQMyyz8QnT9luJNKoRcCnF7TL4ffx"
           login_service: 'planetarycomputer'
-          userdata_url: 'https://planetarycomputer.microsoft.com/id/users/userdata'
-          token_url: 'https://planetarycomputer.microsoft.com/id/o/token/'
-          authorize_url: 'https://planetarycomputer.microsoft.com/id/o/authorize/'
+          userdata_url: 'https://${oauth_host}.microsoft.com/id/users/userdata'
+          token_url: 'https://${oauth_host}.microsoft.com/id/o/token/'
+          authorize_url: 'https://${oauth_host}.microsoft.com/id/o/authorize/'
           username_key: 'email'
           userdata_method: 'GET'
 

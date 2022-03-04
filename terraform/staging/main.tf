@@ -16,6 +16,7 @@ module "resources" {
 
   # DaskHub ------------------------------------------------------------------
   dns_label                 = "pcc-staging"
+  oauth_host                = "planetarycomputer-staging"
   jupyterhub_host           = "pcc-staging.westeurope.cloudapp.azure.com"
   user_placeholder_replicas = 0
   stac_url                  = "https://planetarycomputer-staging.microsoft.com/api/stac/v1/"
