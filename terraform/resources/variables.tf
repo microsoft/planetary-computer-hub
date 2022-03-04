@@ -16,6 +16,11 @@ variable "kubernetes_version" {
   description = "The Kubernetes version. Used in `aks.tf` in several places."
 }
 
+variable "oauth_host" {
+  type        = string
+  description = "The hostname of the oauth2 provider."
+}
+
 variable "jupyterhub_host" {
   type        = string
   description = "The hostname (no protocol, no hub prefix) for JupyterHub."

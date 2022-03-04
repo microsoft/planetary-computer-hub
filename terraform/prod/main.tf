@@ -16,6 +16,7 @@ module "resources" {
 
   # DaskHub ------------------------------------------------------------------
   dns_label                 = "pccompute"
+  oauth_host                = "planetarycomputer"
   jupyterhub_host           = "pccompute.westeurope.cloudapp.azure.com"
   user_placeholder_replicas = 1
   stac_url                  = "https://planetarycomputer.microsoft.com/api/stac/v1/"
