@@ -19,6 +19,10 @@ daskhub:
         name: pcccr.azurecr.io/jupyterhub/k8s-hub
         tag: "1.0.1.post0"
 
+      cull:
+        enabled: true
+        maxAge: 64800  # 18 hours
+
       config:
         JupyterHub:
           admin_access: false
