@@ -21,7 +21,7 @@ daskhub:
 
       cull:
         enabled: true
-        maxAge: 64800  # 18 hours
+        maxAge: 86400  # 24 hours
 
       config:
         JupyterHub:
