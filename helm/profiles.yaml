@@ -12,6 +12,7 @@ daskhub:
             cpu_limit: 4
             mem_guarantee: "25G"
             mem_limit: "32G"
+            extra_resource_limits: {"nvidia.com/gpu": "0"}
             default_url: "/lab/tree/PlanetaryComputerExamples/README.md"
             node_affinity_required:
               - matchExpressions:
@@ -29,6 +30,7 @@ daskhub:
             cpu_limit: 8
             mem_guarantee: "54G"
             mem_limit: "59G"
+            extra_resource_limits: {"nvidia.com/gpu": "0"}
             default_url: "/lab/tree/PlanetaryComputerExamples/README.md"
             node_affinity_required:
               - matchExpressions:
@@ -101,6 +103,7 @@ daskhub:
             cpu_limit: 4
             mem_guarantee: "24G"
             mem_limit: "30G"
+            extra_resource_limits: {"nvidia.com/gpu": "0"}
             default_url: "/desktop"
             node_affinity_required:
               - matchExpressions:
