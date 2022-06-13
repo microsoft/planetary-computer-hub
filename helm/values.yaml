@@ -423,3 +423,15 @@ daskhub:
                 operator: In
                 values:
                 - core
+
+cryptnono:
+  tolerations:
+    # deploy anti-cryptomining cryptnono on all nodes
+    - effect: NoSchedule
+      key: hub.jupyter.org/dedicated
+      operator: Equal
+      value: user
+    - effect: NoSchedule
+      key: hub.jupyter.org_dedicated
+      operator: Equal
+      value: user
