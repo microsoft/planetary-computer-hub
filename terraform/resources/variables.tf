@@ -11,9 +11,9 @@ variable "region" {
   description = "The Azure region to deploy in. We choose 'West Europe' to match the data."
 }
 
-variable "kubernetes_version" {
+variable "version_number" {
   type        = string
-  description = "The Kubernetes version. Used in `aks.tf` in several places."
+  description = "The version number for this deployment. Useful for standing up new stacks and migrating."
 }
 
 variable "oauth_host" {
@@ -145,10 +145,7 @@ variable "kbatch_proxy_url" {
 # Local variables
 
 locals {
-  stack_id          = "pcc"
-  location          = lower(replace(var.region, " ", ""))
-  prefix            = "${local.stack_id}-${local.location}"
-  namespaced_prefix = "${local.stack_id}-${var.environment}"
-  # maybe_staging_prefix is "pcc-staging" for staging, and "pcc" for prod
-  maybe_staging_prefix = var.environment == "staging" ? local.namespaced_prefix : local.prefix
+  stack_id = "pcc"
+  location = lower(replace(var.region, " ", ""))
+  prefix   = "${local.stack_id}-${local.location}-${var.environment}-${var.version_number}"
 }

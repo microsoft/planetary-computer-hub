@@ -1,0 +1,16 @@
+initContainers:
+  - name: velero-plugin-for-microsoft-azure
+    image: velero/velero-plugin-for-microsoft-azure:v1.5.0
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+
+configuration:
+  provider: azure
+  backupStorageLocation:
+    bucket: velero
+    config:
+      subscriptionId: 9da7523a-cb61-4c3e-b1d4-afa5fc6d2da9
+      resourceGroup: pc-manual-resources
+      storageAccount: pchubbackup

@@ -7,7 +7,7 @@ dependencies:
   - name: daskhub
     # NOTE: Update dependencies/requirements.txt at the same time.
     # The chart at https://helm.dask.org/ is helpful.
-    version: "2021.6.1"
+    version: "2022.6.0"
     repository: https://helm.dask.org
   - name: kbatch-proxy
     version: "0.2.14"

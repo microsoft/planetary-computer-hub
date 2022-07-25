@@ -5,7 +5,8 @@ data "azurerm_key_vault" "deploy_secrets" {
 
 # JupyterHub
 data "azurerm_key_vault_secret" "jupyterhub_proxy_secret_token" {
-  name         = "${local.namespaced_prefix}--jupyterhub-proxy-secret-token"
+  # name         = "${local.namespaced_prefix}--jupyterhub-proxy-secret-token"
+  name         = "pcc-staging--jupyterhub-proxy-secret-token"
   key_vault_id = data.azurerm_key_vault.deploy_secrets.id
 }
 
@@ -29,6 +30,36 @@ data "azurerm_key_vault_secret" "azure_client_secret" {
 
 # kbatch integration
 data "azurerm_key_vault_secret" "kbatch_server_api_token" {
-  name         = "${local.namespaced_prefix}--kbatch-server-api-token"
+  # name         = "${local.namespaced_prefix}--kbatch-server-api-token"
+  name         = "pcc-staging--kbatch-server-api-token"
+  key_vault_id = data.azurerm_key_vault.deploy_secrets.id
+}
+
+# Velero
+
+data "azurerm_key_vault_secret" "velero_azure_subscription_id" {
+  # name         = "${local.namespaced_prefix}--kbatch-server-api-token"
+  name         = "${local.stack_id}--velero-azure-subscription-id"
+  key_vault_id = data.azurerm_key_vault.deploy_secrets.id
+}
+
+
+data "azurerm_key_vault_secret" "velero_azure_tenant_id" {
+  # name         = "${local.namespaced_prefix}--kbatch-server-api-token"
+  name         = "${local.stack_id}--velero-azure-tenant-id"
+  key_vault_id = data.azurerm_key_vault.deploy_secrets.id
+}
+
+
+data "azurerm_key_vault_secret" "velero_azure_client_id" {
+  # name         = "${local.namespaced_prefix}--kbatch-server-api-token"
+  name         = "${local.stack_id}--velero-azure-client-id"
+  key_vault_id = data.azurerm_key_vault.deploy_secrets.id
+}
+
+
+data "azurerm_key_vault_secret" "velero_azure_client_secret" {
+  # name         = "${local.namespaced_prefix}--kbatch-server-api-token"
+  name         = "${local.stack_id}--velero-azure-client-secret"
   key_vault_id = data.azurerm_key_vault.deploy_secrets.id
 }
