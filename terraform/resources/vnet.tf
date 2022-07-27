@@ -35,3 +35,27 @@ resource "azurerm_subnet_network_security_group_association" "pc_compute" {
   subnet_id                 = azurerm_subnet.node_subnet.id
   network_security_group_id = azurerm_network_security_group.pc_compute.id
 }
+
+
+resource "azurerm_subnet" "frontend" {
+  name                 = "frontend"
+  resource_group_name  = azurerm_resource_group.pc_compute.name
+  virtual_network_name = azurerm_virtual_network.pc_compute.name
+  address_prefixes     = ["10.254.0.0/24"]
+}
+
+resource "azurerm_subnet" "backend" {
+  name                 = "backend"
+  resource_group_name  = azurerm_resource_group.pc_compute.name
+  virtual_network_name = azurerm_virtual_network.pc_compute.name
+  address_prefixes     = ["10.254.2.0/24"]
+}
+
+
+resource "azurerm_public_ip" "pc_compute" {
+  name                = "pc-compute-pip"
+  resource_group_name = azurerm_resource_group.pc_compute.name
+  location            = azurerm_resource_group.pc_compute.location
+  sku                 = "Standard"
+  allocation_method   = "Static"
+}

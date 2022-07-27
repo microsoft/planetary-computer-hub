@@ -43,6 +43,12 @@ resource "azurerm_kubernetes_cluster" "pc_compute" {
     skip_nodes_with_system_pods = false # ensures system pods don't keep GPU nodes alive
   }
 
+  # Creates an Application Gateway addon for ingress.
+
+  ingress_application_gateway {
+    gateway_id = azurerm_application_gateway.network.id
+  }
+
   # azure_active_directory_role_based_access_control {
   #   managed            = true
   #   azure_rbac_enabled = true
