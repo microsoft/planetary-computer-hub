@@ -228,11 +228,11 @@ daskhub:
 
       backend:
         scheduler:
-          cores:
-            request: 1.0
+          cpu:
+            requests: 1.0
             limit: 2.0
           memory:
-            request: 8G
+            requests: 8G
             limit: 10G
           extraPodConfig:
             tolerations:
