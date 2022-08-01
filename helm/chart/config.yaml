@@ -1,0 +1,426 @@
+daskhub:
+  jupyterhub:
+    prePuller:
+      # only pre-pull the default image (Python)
+      pullProfileListImages: false
+
+    scheduling:
+      podPriority:
+        enabled: true
+      userScheduler:
+        enabled: true
+      corePods:
+        nodeAffinity:
+          matchNodePurpose: "require"
+
+    hub:
+      baseUrl: "/compute/"
+      image:
+        name: pcccr.azurecr.io/jupyterhub/k8s-hub
+        tag: "1.0.1.post0"
+
+      config:
+        JupyterHub:
+          admin_access: false
+          admin_users:
+            - taugspurger@microsoft.com
+
+          authenticator_class: generic-oauth
+        GenericOAuthenticator:
+          # oauth_callback_url, client_secret are set via terraform.
+          client_id: "YRKd72gJAcBEQMyyz8QnT9luJNKoRcCnF7TL4ffx"
+          login_service: 'planetarycomputer'
+          userdata_url: 'https://${oauth_host}.microsoft.com/id/users/userdata'
+          token_url: 'https://${oauth_host}.microsoft.com/id/o/token/'
+          authorize_url: 'https://${oauth_host}.microsoft.com/id/o/authorize/'
+          username_key: 'email'
+          userdata_method: 'GET'
+
+      extraEnv:
+        # This service principal has read permission on Azure API management.
+        AZURE_TENANT_ID: "72f988bf-86f1-41af-91ab-2d7cd011db47"
+        AZURE_CLIENT_ID: "185e2bd5-f11e-490c-8849-7889951120b4"
+        # AZURE_CLIENT_SECRET, PC_ID_TOKEN, APPLICATIONINSIGHTS_CONNECTION_STRING are set via terraform
+
+      networkPolicy:
+        # Disable hub network Policy, so that the dask gateway server API can
+        # reach the hub directly
+        # https://github.com/dask/helm-chart/issues/142
+        enabled: false
+
+      extraFiles:
+        jupyterhub_opencensus_monitor:
+          mountPath: /usr/local/jupyterhub_opencensus_monitor.py
+          # TODO(https://github.com/hashicorp/terraform-provider-helm/issues/628): use set-file
+          # Using jupyterhub_opencensus_monitor.yaml for now.
+
+      services:
+        opencensus-monitoring:
+          command:
+            - python3
+            - /usr/local/jupyterhub_opencensus_monitor.py
+          admin: true
+        kbatch:
+          # api_token and URL are set by terraform
+          admin: true
+
+      # Volumes for customizing the JupyterHub UI
+      # https://discourse.jupyter.org/t/customizing-jupyterhub-on-kubernetes/1769/4
+      extraVolumes:
+        - name: hub-templates
+          configMap:
+            name: hub-templates
+        - name: hub-external
+          configMap:
+            name: hub-external
+
+      extraVolumeMounts:
+        - name: hub-templates
+          mountPath: /etc/jupyterhub/templates
+        - name: hub-external
+          mountPath: /usr/local/share/jupyterhub/static/external
+
+      extraConfig:
+        mylabels: |
+          c.KubeSpawner.extra_labels = {}
+        kubespawner: |
+          c.KubeSpawner.start_timeout = 15 * 60  # 15 minutes
+        01-add-dask-gateway-values: |
+          # The daskhub helm chart doesn't correctly handle hub.baseUrl.
+          # DASK_GATEWAY__PUBLIC_ADDRESS set via terraform
+          c.KubeSpawner.environment["DASK_GATEWAY__ADDRESS"] = "http://proxy-http:8000/compute/services/dask-gateway/"
+          c.KubeSpawner.environment["DASK_GATEWAY__PUBLIC_ADDRESS"] = "https://${jupyterhub_host}/compute/services/dask-gateway/"
+        templates: |
+          c.JupyterHub.template_paths.insert(0, "/etc/jupyterhub/templates")
+        pre_spawn_hook: |
+          # Configure environment tailored to the specific user
+          # Sets the following
+          # 1. environment variable PC_SDK_SUBSCRIPTION_KEY
+          # ---------------------------------------------------
+
+          async def pre_spawn_hook(spawner):
+              username = spawner.user.name
+              # `username` is an email address. We use that email address to look up the
+              # user in the Django App
+              import os
+              import requests
+              import azure.identity
+              import azure.mgmt.apimanagement
+              from traitlets.log import get_logger
+
+              log = get_logger()
+              log.info("starting pre_spawn_hook for %s" % username)
+              # The hub is configured with "service principal with secret" environment variables.
+              identity = azure.identity.EnvironmentCredential()
+              PC_ID_TOKEN = os.environ["PC_ID_TOKEN"]
+
+              r = requests.get(
+                  f"https://planetarycomputer.microsoft.com/id/users/users/{username}/",
+                  headers=dict(Authorization="Token %s" % PC_ID_TOKEN)
+              )
+              if r.status_code != 200:
+                  log.warning("pre_spawn_hook failed getting the user ID for %s. -- %s",
+                              username, r.content)
+                  return
+
+              pk = r.json()["pk"]
+              log.debug("Got PK %s", pk)
+              # This PK should match the PK in API management.
+              # The Hub pod is configured to talk to API Management
+              identity = azure.identity.DefaultAzureCredential()
+              apim_client = azure.mgmt.apimanagement.ApiManagementClient(
+                  identity,
+                  "9da7523a-cb61-4c3e-b1d4-afa5fc6d2da9"
+              )
+
+              # We can now request the subscription. These follow the pattern
+              # {id}-planetarycomputer
+              try:
+                  log.info("Getting subscriptions for %s-%s", username, pk)
+                  keys = apim_client.subscription.list_secrets(
+                      "pc-manual-resources", "planetarycomputer", f"{pk}-planetarycomputer"
+                  )
+              except Exception as e:
+                  log.exception("Failed to get secrets for %s", username)
+              else:
+                  spawner.environment["PC_SDK_SUBSCRIPTION_KEY"] = keys.primary_key
+
+          c.KubeSpawner.pre_spawn_hook = pre_spawn_hook
+
+    cull:
+      enabled: true
+      maxAge: 86400  # 24 hours
+
+    proxy:
+      https:
+        enabled: true
+        letsencrypt:
+          contactEmail: "taugspurger@microsoft.com"
+
+    singleuser:
+      # These limits match the "large" profiles, so that a user requesting large will be successfully scheduled.
+      # The user scheduler doesn't evict multiple placeholders.
+      memory:
+        limit: "30G"
+        guarantee: "30G"
+      cpu:
+        limit: 6.0
+        guarantee: 6.0
+
+      storage:
+        capacity: "15Gi"
+        extraVolumes:
+          - name: user-etc-singleuser
+            configMap:
+              name: user-etc-singleuser
+
+          # Workaround small /dev/shm issue.
+          # https://github.com/pangeo-data/pangeo-docker-images/issues/258
+          # https://stackoverflow.com/questions/46085748/define-size-for-dev-shm-on-container-engine/46434614#46434614
+          # This can be fixed upstream in planetary-computer-containers once the docker GitHub action
+          # is updated to support setting shm-size.
+          # https://github.com/docker/build-push-action/issues/263
+          - name: dshm
+            emptyDir:
+              medium: Memory
+
+        extraVolumeMounts:
+          - name: user-etc-singleuser
+            mountPath: /etc/singleuser
+
+          - name: dshm
+            mountPath: /dev/shm
+
+      extraEnv:
+        DASK_GATEWAY__CLUSTER__OPTIONS__IMAGE: '{JUPYTER_IMAGE_SPEC}'
+        DASK_DISTRIBUTED__DASHBOARD__LINK: '/user/{JUPYTERHUB_USER}/proxy/{port}/status'
+        DASK_LABEXTENSION__FACTORY__MODULE: 'dask_gateway'
+        DASK_LABEXTENSION__FACTORY__CLASS: 'GatewayCluster'
+        NVIDIA_DRIVER_CAPABILITIES: 'compute,utility'
+        # GDAL / Rasterio environment variables for performance
+        GDAL_DISABLE_READDIR_ON_OPEN: "EMPTY_DIR"
+        GDAL_HTTP_MERGE_CONSECUTIVE_RANGES: "YES"
+
+      lifecycleHooks:
+        postStart:
+          exec:
+            command:
+              - "bash"
+              - "/etc/singleuser/k8s-lifecycle-hook-post-start.sh"
+
+
+  dask-gateway:
+    gateway:
+      prefix: "/compute/services/dask-gateway"
+      auth:
+        jupyterhub:
+          apiToken: "{{ tf.jupyterhub_dask_gateway_token }}"
+          apiUrl: http://proxy-http:8000/compute/hub/api
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: hub.jupyter.org/node-purpose
+                operator: In
+                values:
+                - core
+
+      backend:
+        scheduler:
+          cores:
+            request: 1.0
+            limit: 2.0
+          memory:
+            request: 8G
+            limit: 10G
+          extraPodConfig:
+            tolerations:
+              - key: 'hub.jupyter.org_dedicated'
+                operator: 'Equal'
+                value: 'user'
+                effect: 'NoSchedule'
+            affinity:
+              nodeAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: hub.jupyter.org/node-purpose 
+                        operator: In
+                        values:
+                          - core
+                          - user
+
+        worker:
+          extraPodConfig:
+            tolerations:
+              - key: "k8s.dask.org/dedicated"
+                operator: "Equal"
+                value: "worker"
+                effect: "NoSchedule"
+              - key: "k8s.dask.org_dedicated"
+                operator: "Equal"
+                value: "worker"
+                effect: "NoSchedule"
+              - key: "kubernetes.azure.com/scalesetpriority"
+                operator: "Equal"
+                value: "spot"
+                effect: "NoSchedule"
+
+      extraConfig:
+        01-idle: |
+          c.KubeClusterConfig.idle_timeout = 20 * 60  # seconds
+          c.KubeClusterConfig.cluster_max_cores = 400  # 50 nodes @ 8 workers / node, 1 core / worker
+          c.KubeClusterConfig.cluster_max_memory = "3200 G"  # 8 GiB / core
+          c.KubeClusterConfig.cluster_max_workers = 400  # 1 core, 8 GiB / worker
+
+        02-optionHandler: |
+            from dask_gateway_server.options import Options, Float, String, Mapping, Bool
+
+            def cluster_options(user):
+                def option_handler(options):
+                    if ":" not in options.image:
+                        raise ValueError("When specifying an image you must also provide a tag")
+
+                    def escape(username):
+                        import string
+
+                        safe_chars = set(string.ascii_lowercase + string.digits)
+                        chars = []
+                        for char in username:
+                            if char in safe_chars:
+                                chars.append(char.lower())
+                            else:
+                                chars.append(".")
+                        return "".join(chars)
+
+                    extra_annotations = {
+                        "hub.jupyter.org/username": user.name,
+                    }
+                    extra_labels = {
+                        "hub.jupyter.org/username": escape(user.name),
+                    }
+                    # Maybe add a GPU request
+                    worker_extra_pod_config = {
+                        "tolerations": [
+                            {
+                                "key": "kubernetes.azure.com/scalesetpriority",
+                                "operator": "Equal",
+                                "value": "spot",
+                                "effect": "NoSchedule",
+                            },
+                            {
+                                "key": "k8s.dask.org_dedicated",
+                                "operator": "Equal",
+                                "value": "worker",
+                                "effect": "NoSchedule",
+                            },
+                        ]
+                    }
+                    if options.gpu:
+                        node_affinity = {
+                            "key": "pc.microsoft.com/workerkind",
+                            "operator": "In",
+                            "values": ["gpu"],
+                        }
+
+                        worker_extra_container_config = {
+                            "resources": {
+                                "limits": {
+                                    "nvidia.com/gpu": 1,
+                                },
+                            },
+                        }
+                        worker_extra_pod_config["tolerations"].append(
+                            {
+                                "key": "nvidia.com/gpu",
+                                "operator": "Equal",
+                                "value": "present",
+                                "effect": "NoSchedule",
+                            }
+                        )
+                        options.environment["NVIDIA_DRIVER_CAPABILITIES"] = 'compute,utility'
+                    else:
+                        worker_extra_container_config = {}
+                        node_affinity = {
+                            "key": "pc.microsoft.com/workerkind",
+                            "operator": "In",
+                            "values": ["cpu"],
+                        }
+
+                    # Prevents worker pods from using the core pool.
+                    dask_worker_affinity = {
+                        "key": "k8s.dask.org/dedicated",
+                        "operator": "In",
+                        "values": ["worker"],
+                    }
+                    worker_extra_pod_config["affinity"] = {
+                        "nodeAffinity": {
+                            "requiredDuringSchedulingIgnoredDuringExecution": {
+                                "nodeSelectorTerms": [
+                                    {"matchExpressions": [node_affinity, dask_worker_affinity]},
+                                ],
+                            },
+                        },
+                    }
+
+                    # We multiply the requests by 0.95 to ensure that that they
+                    # pack well onto nodes. Kubernetes reserves a small fraction
+                    # of the memory / CPU for itself, so the common situation of
+                    # a node with 4 cores and a user requesting 4 cores means
+                    # we request just over half of the *allocatable* CPU, and so
+                    # we can't pack more than 1 worker on that node.
+                    # On GCP, the kubernetes requests are ~12% of the CPU.
+                    return {
+                        "worker_cores": 0.9 * options.worker_cores,
+                        "worker_cores_limit": options.worker_cores,
+                        "worker_memory": "%fG" % (0.88 * options.worker_memory),
+                        "worker_memory_limit": "%fG" % options.worker_memory,
+                        "image": options.image,
+                        "scheduler_extra_pod_annotations": extra_annotations,
+                        "worker_extra_pod_annotations": extra_annotations,
+                        "scheduler_extra_pod_labels": extra_labels,
+                        "worker_extra_pod_labels": extra_labels,
+                        "worker_extra_container_config": worker_extra_container_config,
+                        "environment": options.environment,
+                        "worker_extra_pod_config": worker_extra_pod_config,
+                        "gpu": options.gpu,
+                    }
+
+                default_env = {
+                    "GDAL_DISABLE_READDIR_ON_OPEN": "EMPTY_DIR",
+                    "GDAL_HTTP_MERGE_CONSECUTIVE_RANGES": "YES"
+                }
+                return Options(
+                    Float("worker_cores", 1, min=0.1, max=8, label="Worker Cores"),
+                    Float("worker_memory", 8, min=1, max=64, label="Worker Memory (GiB)"),
+                    String("image", default="pangeo/pangeo-notebook:latest", label="Image"),
+                    Bool("gpu", default=False, label="GPU"),
+                    Mapping("environment", default=default_env, label="Environment Variables"),
+                    handler=option_handler,
+                )
+            c.Backend.cluster_options = cluster_options
+    traefik:
+      service:
+        type: LoadBalancer
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: hub.jupyter.org/node-purpose
+                operator: In
+                values:
+                - core
+
+cryptnono:
+  tolerations:
+    # deploy anti-cryptomining cryptnono on all nodes
+    - effect: NoSchedule
+      key: hub.jupyter.org/dedicated
+      operator: Equal
+      value: user
+    - effect: NoSchedule
+      key: hub.jupyter.org_dedicated
+      operator: Equal
+      value: user

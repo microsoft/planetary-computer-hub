@@ -115,7 +115,10 @@ $ az keyvault secret set --vault-name pc-deploy-secrets --name '<prefix>--<key-n
 | pcc--azure-client-secret                   | Sets `daskhub.jupyterhub.hub.extraEnv.AZURE_CLIENT_SECRET`, an secret key to allow the hub to access Azure resources, enabling the API management integration |
 | pcc-staging--kbatch-server-api-token       | JupyterHub token for the kbatch application in staging.                                                                                                       |
 | pcc-prod--kbatch-server-api-token          | JupyterHub token for the kbatch application in production.                                                                                                    |
-
+| pcc--velero-azure-subscription-id          | Set in `velero_credentials.tpl` for backups / migrations                                                                                                      |
+| pcc--velero-azure-tenant-id                | Set in `velero_credentials.tpl` for backups / migrations                                                                                                      |
+| pcc--velero-azure-client-id                | Set in `velero_credentials.tpl` for backups / migrations                                                                                                      |
+| pcc--velero-azure-client-secret            | Set in `velero_credentials.tpl` for backups / migrations                                                                                                      |
 
 ## Continuous deployment
 
@@ -134,6 +137,12 @@ $ az role assignment create \
 ```
 
 Likewise for production (change the resource group name in the scope).
+
+## Velero backup configuration
+
+The Terraform deployment also installs [velero](https://velero.io/) on the cluster via helm. See `velero.tf`.
+
+This requires the manual creation of some resources.
 
 ## Opencensus monitor service
 

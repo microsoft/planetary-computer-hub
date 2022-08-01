@@ -5,6 +5,10 @@ cd helm/chart && \
     helm dependency update && \
     cd ../..
 
+cd helm/chart.2 && \
+    helm dependency update && \
+    cd ../..
+
 echo "[init terraform]"
 terraform -chdir=terraform/${ENVIRONMENT} init
 

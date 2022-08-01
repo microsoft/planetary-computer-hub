@@ -1,0 +1,16 @@
+# configmap.yaml that I install into the jupyterhub namespace
+# through a custom Helm chart that has a requirements.yaml file
+# that in turn installs jupyterhub.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hub-templates
+data:
+  {{- (.Files.Glob "files/etc/jupyterhub/templates/*.html").AsConfig | nindent 2 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hub-external
+data:
+  {{- (.Files.Glob "files/static/external/*").AsConfig | nindent 2 }}

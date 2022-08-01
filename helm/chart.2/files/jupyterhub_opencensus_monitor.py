@@ -1,0 +1,144 @@
+"""
+Opencensus monitor for JupyterHub as a JupyterHub service.
+"""
+import asyncio
+import datetime
+import logging
+from typing import Dict, List
+import os
+from collections import Counter, defaultdict
+
+import httpx
+from opencensus.ext.azure import metrics_exporter
+from opencensus.ext.azure.log_exporter import AzureLogHandler
+import opencensus.stats.aggregation
+import opencensus.stats.view
+import opencensus.stats.stats
+import opencensus.stats.measure
+import opencensus.tags.tag_map
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+handler.setLevel(logging.INFO)
+logger.addHandler(handler)
+
+azlogger = logging.getLogger("pc_metrics")
+azlogger.setLevel(logging.INFO)
+handler = AzureLogHandler()
+handler.setLevel(logging.INFO)
+azlogger.addHandler(handler)
+
+DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+
+__version__ = "0.1.0"
+INTERVAL = 5  # seconds
+
+# ---- Metrics configuration ----
+# We collect / record by counts by profile, so create one TagMap per profile.
+server_tag_maps = defaultdict(opencensus.tags.tag_map.TagMap)
+
+server_count_measure = opencensus.stats.measure.MeasureInt(
+    "Active servers", "Number of currently active servers", unit="servers"
+)
+server_count_view = opencensus.stats.view.View(
+    "Active servers",
+    "Number of currently active servers",
+    ["profile", "environment"],
+    server_count_measure,
+    opencensus.stats.aggregation.LastValueAggregation(),
+)
+
+measurement_maps = defaultdict(
+    opencensus.stats.stats.stats.stats_recorder.new_measurement_map
+)
+opencensus.stats.stats.stats.view_manager.register_view(server_count_view)
+exporter = metrics_exporter.new_metrics_exporter()
+
+# ---- Metric helpers ----
+
+
+def count_notebook_servers(data: list):
+    """
+    Count the number of notebook servers by profile.
+    """
+    server_count = Counter()
+
+    for user in data:
+        for _, server in user["servers"].items():
+            profile = server["user_options"].get("profile", "none")
+            tag_map = server_tag_maps[profile]
+            tag_map.insert("profile", profile)
+            server_count[profile] += 1
+
+    return server_count
+
+
+def compute_durations(users_start_times: Dict[str, datetime.datetime], data: list) -> List[int]:
+    current_users = {user["name"] for user in data}
+    previous_users = set(users_start_times)
+    dropped_users = previous_users - current_users
+    new_users = current_users - previous_users
+
+    now = datetime.datetime.utcnow()
+    durations = []
+
+    for user in dropped_users:
+        start_time = users_start_times.pop(user)  # mutates in place!
+        duration = now - start_time
+        durations.append(int(duration.total_seconds()))
+
+    for user in data:
+        if user["name"] in new_users:
+            # assumes no named servers
+            server = user["servers"][""]
+            users_start_times[user["name"]] = datetime.datetime.strptime(server["started"], DATE_FORMAT) 
+
+    return durations
+
+
+async def main():
+
+    JUPYTERHUB_API_TOKEN = os.environ["JUPYTERHUB_API_TOKEN"]
+    JUPYTERHUB_API_URL = os.environ["JUPYTERHUB_API_URL"]
+    # prod / staging
+    JUPYTERHUB_ENVIRONMENT = os.environ.get("JUPYTERHUB_ENVIRONMENT", "none").lower()
+
+    async with httpx.AsyncClient() as client:
+        headers = {"Authorization": f"token {JUPYTERHUB_API_TOKEN}"}
+
+        logger.debug("checking hub API")
+        response = await client.get(f"{JUPYTERHUB_API_URL}/")
+        logger.info(
+            "Monitoring url: %s, version: %s",
+            JUPYTERHUB_API_URL,
+            response.json()["version"],
+        )
+
+        users_start_times: Dict[str, datetime.datetime] = {}
+
+        while True:
+            response = await client.get(
+                f"{JUPYTERHUB_API_URL}/users?state=active", headers=headers
+            )
+            data = response.json()
+            server_count = count_notebook_servers(data)
+            for profile, count in server_count.items():
+                measurement_map = measurement_maps[profile]
+                tag_map = server_tag_maps[profile]
+                tag_map.insert("environment", JUPYTERHUB_ENVIRONMENT)
+                measurement_map.measure_int_put(server_count_measure, count)
+                measurement_map.record(tag_map)
+
+            durations = compute_durations(users_start_times, data)
+
+            for duration in durations:
+                azlogger.info("duration %d", duration, extra={"custom_dimensions": {"duration": duration}})
+
+            logger.debug("Sleeping for %d", INTERVAL)
+            await asyncio.sleep(INTERVAL)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

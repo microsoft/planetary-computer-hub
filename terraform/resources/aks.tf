@@ -1,10 +1,11 @@
 resource "azurerm_kubernetes_cluster" "pc_compute" {
-  name                = "${local.maybe_staging_prefix}-cluster"
-  location            = azurerm_resource_group.pc_compute.location
-  resource_group_name = azurerm_resource_group.pc_compute.name
-  dns_prefix          = "${local.maybe_staging_prefix}-cluster"
-  kubernetes_version  = var.kubernetes_version
-  sku_tier            = "Paid"
+  name                      = "${local.maybe_versioned_prefix}-cluster"
+  location                  = azurerm_resource_group.pc_compute.location
+  resource_group_name       = azurerm_resource_group.pc_compute.name
+  dns_prefix                = "${local.maybe_versioned_prefix}-cluster"
+  kubernetes_version        = var.kubernetes_version
+  sku_tier                  = "Paid"
+  automatic_channel_upgrade = var.aks_automatic_channel_upgrade
 
   addon_profile {
     kube_dashboard {
@@ -16,13 +17,24 @@ resource "azurerm_kubernetes_cluster" "pc_compute" {
     }
   }
 
+  # The "v0" deployments didn't have RBAC enabled. Having to specify it
+  # as a dynamic block here.
+  # Remove this once we're done with the v0 deployments.
+  dynamic "azure_active_directory_role_based_access_control" {
+    for_each = (var.aks_azure_active_direcotry_role_based_access_control ? {} : {})
+    content {
+      managed            = true
+      azure_rbac_enabled = true
+    }
+  }
+
   # Core node-pool
   default_node_pool {
     name            = "core"
     vm_size         = var.core_vm_size
     os_disk_size_gb = 100
     # Managed for staging, since A-series VM don't support Ephemeral
-    os_disk_type        = var.environment == "staging" ? "Managed" : "Ephemeral"
+    os_disk_type        = var.core_os_disk_type
     enable_auto_scaling = true
     node_count          = 1
     min_count           = 1

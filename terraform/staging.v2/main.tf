@@ -1,16 +1,17 @@
 module "resources" {
-  source      = "../resources"
-  environment = "staging"
-  region      = "West Europe"
+  source         = "../resources"
+  environment    = "staging"
+  region         = "West Europe"
+  version_number = "2"
   # subscription = "Planetary Computer"
 
   # AKS ----------------------------------------------------------------------
-  kubernetes_version                                   = "1.21.9"
-  aks_azure_active_direcotry_role_based_access_control = false
-  aks_automatic_channel_upgrade                        = null
+  kubernetes_version                                   = null
+  aks_azure_active_direcotry_role_based_access_control = true
+  aks_automatic_channel_upgrade                        = "stable"
 
   # 2GiB of RAM, 1 CPU core
-  core_vm_size              = "Standard_A2_v2"
+  core_vm_size              = "Standard_A4_v2"
   core_os_disk_type         = "Managed"
   user_pool_min_count       = 1
   cpu_worker_pool_min_count = 0
@@ -19,10 +20,10 @@ module "resources" {
   workspace_id = "83dcaf36e047a90f"
 
   # DaskHub ------------------------------------------------------------------
-  helm_chart                = "../../helm/chart"
-  dns_label                 = "pcc-staging"
+  helm_chart                = "../../helm/chart.2"
+  dns_label                 = "pcc-staging-2"
   oauth_host                = "planetarycomputer-staging"
-  jupyterhub_host           = "pcc-staging.westeurope.cloudapp.azure.com"
+  jupyterhub_host           = "pcc-staging-2.westeurope.cloudapp.azure.com"
   user_placeholder_replicas = 0
   stac_url                  = "https://planetarycomputer-staging.microsoft.com/api/stac/v1/"
 
@@ -42,7 +43,7 @@ terraform {
     resource_group_name  = "pc-manual-resources"
     storage_account_name = "pctfstate"
     container_name       = "pcc"
-    key                  = "staging.tfstate"
+    key                  = "staging-2.tfstate"
   }
 }
 

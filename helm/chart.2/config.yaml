@@ -19,6 +19,16 @@ daskhub:
         name: pcccr.azurecr.io/jupyterhub/k8s-hub
         tag: "1.0.1.post0"
 
+      networkPolicy:
+        ingress:
+          - ports:
+            - port: http
+            - port: https
+            from:
+              - podSelector:
+                  matchLabels:
+                    gateway.dask.org/instance: "${release}-dask-gateway"
+        
       config:
         JupyterHub:
           admin_access: false
@@ -41,12 +51,6 @@ daskhub:
         AZURE_TENANT_ID: "72f988bf-86f1-41af-91ab-2d7cd011db47"
         AZURE_CLIENT_ID: "185e2bd5-f11e-490c-8849-7889951120b4"
         # AZURE_CLIENT_SECRET, PC_ID_TOKEN, APPLICATIONINSIGHTS_CONNECTION_STRING are set via terraform
-
-      networkPolicy:
-        # Disable hub network Policy, so that the dask gateway server API can
-        # reach the hub directly
-        # https://github.com/dask/helm-chart/issues/142
-        enabled: false
 
       extraFiles:
         jupyterhub_opencensus_monitor:
@@ -81,8 +85,8 @@ daskhub:
           mountPath: /usr/local/share/jupyterhub/static/external
 
       extraConfig:
-        mylabels: |
-          c.KubeSpawner.extra_labels = {}
+        # mylabels: |
+        #   c.KubeSpawner.extra_labels = {}
         kubespawner: |
           c.KubeSpawner.start_timeout = 15 * 60  # 15 minutes
         01-add-dask-gateway-values: |
@@ -157,9 +161,46 @@ daskhub:
         letsencrypt:
           contactEmail: "taugspurger@microsoft.com"
 
+      chp:
+        networkPolicy:
+          ingress:
+            - ports:
+              - port: http
+              - port: https
+              from:
+                - podSelector:
+                    matchLabels:
+                      gateway.dask.org/instance: "${release}-dask-gateway"
+      traefik:
+        networkPolicy:
+          ingress:
+            - ports:
+              - port: http
+              - port: https
+              from:
+                - podSelector:
+                    matchLabels:
+                      gateway.dask.org/instance: "${release}-dask-gateway"
+
     singleuser:
       # These limits match the "large" profiles, so that a user requesting large will be successfully scheduled.
       # The user scheduler doesn't evict multiple placeholders.
+      extraLabels:
+        hub.jupyter.org/network-access-proxy-http: "true"
+
+      networkPolicy:
+        # Needed for talking to the proxy pod
+        egress:
+          - ports:
+              - port: 8000
+                protocol: TCP
+          - ports:
+              - port: 80
+                protocol: TCP
+          - ports:
+              - port: 443
+                protocol: TCP
+
       memory:
         limit: "30G"
         guarantee: "30G"
@@ -228,11 +269,11 @@ daskhub:
 
       backend:
         scheduler:
-          cpu:
-            requests: 1.0
+          cores:
+            request: 1.0
             limit: 2.0
           memory:
-            requests: 8G
+            request: 8G
             limit: 10G
           extraPodConfig:
             tolerations:

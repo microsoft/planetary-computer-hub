@@ -1,40 +1,41 @@
 module "resources" {
-  source      = "../resources"
-  environment = "staging"
-  region      = "West Europe"
+  source         = "../resources"
+  environment    = "prod"
+  region         = "West Europe"
+  version_number = "2"
   # subscription = "Planetary Computer"
 
   # AKS ----------------------------------------------------------------------
-  kubernetes_version                                   = "1.21.9"
+  kubernetes_version                                   = null
   aks_azure_active_direcotry_role_based_access_control = false
   aks_automatic_channel_upgrade                        = null
 
-  # 2GiB of RAM, 1 CPU core
-  core_vm_size              = "Standard_A2_v2"
-  core_os_disk_type         = "Managed"
+  # 8GB of RAM, 4 CPU cores, ssd base disk
+  core_vm_size              = "Standard_E4s_v3"
+  core_os_disk_type         = "Ephemeral"
   user_pool_min_count       = 1
-  cpu_worker_pool_min_count = 0
+  cpu_worker_pool_min_count = 1
 
   # Logs ---------------------------------------------------------------------
-  workspace_id = "83dcaf36e047a90f"
+  workspace_id = "225cedbd199c55da"
 
   # DaskHub ------------------------------------------------------------------
-  helm_chart                = "../../helm/chart"
-  dns_label                 = "pcc-staging"
-  oauth_host                = "planetarycomputer-staging"
-  jupyterhub_host           = "pcc-staging.westeurope.cloudapp.azure.com"
-  user_placeholder_replicas = 0
-  stac_url                  = "https://planetarycomputer-staging.microsoft.com/api/stac/v1/"
+  helm_chart                = "../../helm/chart.2"
+  dns_label                 = "pccompute-2"
+  oauth_host                = "planetarycomputer"
+  jupyterhub_host           = "pccompute-2.westeurope.cloudapp.azure.com"
+  user_placeholder_replicas = 1
+  stac_url                  = "https://planetarycomputer.microsoft.com/api/stac/v1/"
 
   jupyterhub_singleuser_image_name = "pcccr.azurecr.io/public/planetary-computer/python"
-  jupyterhub_singleuser_image_tag  = "2022.7.14.0"
-  python_image                     = "pcccr.azurecr.io/public/planetary-computer/python:2022.7.14.0"
+  jupyterhub_singleuser_image_tag  = "2022.05.11.0"
+  python_image                     = "pcccr.azurecr.io/public/planetary-computer/python:2022.05.11.0"
   r_image                          = "pcccr.azurecr.io/public/planetary-computer/r:2022.01.17.0"
   gpu_pytorch_image                = "pcccr.azurecr.io/public/planetary-computer/gpu-pytorch:2022.05.2.0"
   gpu_tensorflow_image             = "pcccr.azurecr.io/public/planetary-computer/gpu-tensorflow:2022.02.14.0"
   qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:3.18.0.1"
 
-  kbatch_proxy_url = "http://dhub-staging-kbatch-proxy.staging.svc.cluster.local"
+  kbatch_proxy_url = "http://dhub-prod-kbatch-proxy.prod.svc.cluster.local"
 }
 
 terraform {
@@ -42,7 +43,7 @@ terraform {
     resource_group_name  = "pc-manual-resources"
     storage_account_name = "pctfstate"
     container_name       = "pcc"
-    key                  = "staging.tfstate"
+    key                  = "prod-2.tfstate" # TODO: migrate to prod.tfstate
   }
 }
 
@@ -50,3 +51,9 @@ output "resources" {
   value     = module.resources
   sensitive = true
 }
+
+# We require this, since we used to generate the pcccr ACR
+provider "azurerm" {
+  features {}
+}
+

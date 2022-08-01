@@ -5,9 +5,13 @@ module "resources" {
   # subscription = "Planetary Computer"
 
   # AKS ----------------------------------------------------------------------
-  kubernetes_version = "1.19.7"
+  kubernetes_version                                   = "1.19.7"
+  aks_azure_active_direcotry_role_based_access_control = false
+  aks_automatic_channel_upgrade                        = null
+
   # 8GB of RAM, 4 CPU cores, ssd base disk
   core_vm_size              = "Standard_E4s_v3"
+  core_os_disk_type         = "Ephemeral"
   user_pool_min_count       = 1
   cpu_worker_pool_min_count = 1
 
@@ -15,6 +19,7 @@ module "resources" {
   workspace_id = "225cedbd199c55da"
 
   # DaskHub ------------------------------------------------------------------
+  helm_chart                = "../../helm/chart"
   dns_label                 = "pccompute"
   oauth_host                = "planetarycomputer"
   jupyterhub_host           = "pccompute.westeurope.cloudapp.azure.com"

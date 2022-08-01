@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+# Migrates between `source` and `target` Kubernetes clusters.
+# -- Prerequisites --
+# 1. velero installed in the source and target
+# 2. velero CLI
+# 3. Assigned the Azure RBAC roles
+
+# velero restore logs backup-2022.8.3.0-20220803094420
+# Message=\"The client 'cadf9d56-b930-499e-9dad-0e093705e853' with object id 'cadf9d56-b930-499e-9dad-0e093705e853' does not have authorization to perform action 'Microsoft.Compute/disks/write' over scope '/subscriptions/9da7523a-cb61-4c3e-b1d4-afa5fc6d2da9/resourceGroups/MC_pcc-staging-2-rg_pcc-stagin    g-2-cluster_westeurope/providers/Microsoft.Compute/disks/restore-0af3b536-1a33-4bbd-aac0-2a40cc874583' or the scope is invalid. If access was recently granted, please refresh your credentials.\"" logSource="pkg/controller/restore_controller.go:500" restore=velero/backup-2022.8.3.0-20220803094420
+# - Grant on the Cluster RG. Disk Pool Operator role
+
+
+# ./scripts/migrate backup-2022.8.3.0 pcc-staging-cluster pcc-staging-rg pcc-staging-2-cluster pcc-staging-2-rg staging
+
+set -eu
+
+BACKUP=$1
+SOURCE_CLUSTER=$2
+SOURCE_RG=$3
+TARGET_CLUSTER=$4
+TARGET_RG=$5
+NAMESPACE=$6
+
+
+echo "BACKUP: $BACKUP"
+
+echo "[getting source kubeconfig]"
+az aks get-credentials --name $SOURCE_CLUSTER -g $SOURCE_RG --subscription="Planetary Computer" --file=source-kubeconfig
+echo "[getting target kubeconfig]"
+az aks get-credentials --name $TARGET_CLUSTER -g $TARGET_RG --subscription="Planetary Computer" --file=target-kubeconfig
+
+echo "[starting backup]"
+KUBECONFIG=source-kubeconfig velero backup create --include-namespaces=$NAMESPACE $BACKUP --include-resources pvc,pv -l app=jupyterhub --wait --kubeconfig=source-kubeconfig
+echo "[backup finished]"
+
+echo "[sleeping?]"
+sleep 30
+
+echo "[scaling down target hub]"
+KUBECONFIG=target-kubeconfig kubectl -n $NAMESPACE scale deployment hub --replicas=0
+KUBECONFIG=target-kubeconfig kubectl -n $NAMESPACE delete pvc hub-db-dir || true
+KUBECONFIG=target-kubeconfig velero backup get "${BACKUP}" --kubeconfig=target-kubeconfig
+
+echo "[starting restore]"
+echo "    watch at: 'kubectl logs deployment/velero -n velero -f'"
+KUBECONFIG=target-kubeconfig velero restore create --include-namespaces="$NAMESPACE" --from-backup "$BACKUP" --wait --kubeconfig=target-kubeconfig
+echo "[finished restore]"
+echo "[scaling up target hub]"
+KUBECONFIG=target-kubeconfig kubectl -n "$NAMESPACE" scale deployment hub --replicas=1 --kubeconfig=target-kubeconfig
+echo "[finished]"
+
+rm source-kubeconfig
+rm target-kubeconfig
