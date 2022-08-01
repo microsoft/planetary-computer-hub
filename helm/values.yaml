@@ -184,23 +184,12 @@ daskhub:
             emptyDir:
               medium: Memory
 
-          # # Read-only file share for ML datasets
-          # - name: driven-data
-          #   azureFile:
-          #     secretName: driven-data-file-share
-          #     secretNamespace: ${namespace}
-          #     shareName: driven-data
-          #     readOnly: true
-
         extraVolumeMounts:
           - name: user-etc-singleuser
             mountPath: /etc/singleuser
 
           - name: dshm
             mountPath: /dev/shm
-
-          # - name: driven-data
-          #   mountPath: /driven-data/
 
       extraEnv:
         DASK_GATEWAY__CLUSTER__OPTIONS__IMAGE: '{JUPYTER_IMAGE_SPEC}'

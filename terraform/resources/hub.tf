@@ -145,34 +145,7 @@ resource "helm_release" "dhub" {
 
 }
 
-# data "azurerm_storage_account" "pc-compute" {
-#   name                = "${replace(local.prefix, "-", "")}storage"
-#   resource_group_name = "${local.prefix}-shared-rg"
-# }
-
-# resource "kubernetes_secret" "pc-compute-fileshare" {
-#   metadata {
-#     name      = "driven-data-file-share"
-#     namespace = var.environment
-#   }
-
-#   data = {
-#     azurestorageaccountname = data.azurerm_storage_account.pc-compute.name
-#     azurestorageaccountkey  = data.azurerm_storage_account.pc-compute.primary_access_key
-#   }
-# }
-
-
-# Also put it in the default namespace
-# Our prod cluster seems to be having trouble getting the secret from
-# the prod namespace; possibly becuase it's on an older version of Kubernetes.
-# resource "kubernetes_secret" "pc-compute-fileshare-default" {
-#   metadata {
-#     name = "driven-data-file-share"
-#   }
-
-#   data = {
-#     azurestorageaccountname = data.azurerm_storage_account.pc-compute.name
-#     azurestorageaccountkey  = data.azurerm_storage_account.pc-compute.primary_access_key
-#   }
-# }
+data "azurerm_storage_account" "pc-compute" {
+  name                = "${replace(local.prefix, "-", "")}storage"
+  resource_group_name = "${local.prefix}-shared-rg"
+}
