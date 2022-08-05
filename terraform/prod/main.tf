@@ -1,7 +1,8 @@
 module "resources" {
-  source      = "../resources"
-  environment = "prod"
-  region      = "West Europe"
+  source                 = "../resources"
+  environment            = "prod"
+  region                 = "West Europe"
+  maybe_versioned_prefix = "pcc-westeurope"
   # subscription = "Planetary Computer"
 
   # AKS ----------------------------------------------------------------------

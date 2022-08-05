@@ -1,8 +1,8 @@
 resource "azurerm_kubernetes_cluster" "pc_compute" {
-  name                      = "${local.maybe_versioned_prefix}-cluster"
+  name                      = "${var.maybe_versioned_prefix}-cluster"
   location                  = azurerm_resource_group.pc_compute.location
   resource_group_name       = azurerm_resource_group.pc_compute.name
-  dns_prefix                = "${local.maybe_versioned_prefix}-cluster"
+  dns_prefix                = "${var.maybe_versioned_prefix}-cluster"
   kubernetes_version        = var.kubernetes_version
   sku_tier                  = "Paid"
   automatic_channel_upgrade = var.aks_automatic_channel_upgrade

@@ -3,6 +3,7 @@ module "resources" {
   environment = "staging"
   region      = "West Europe"
   # subscription = "Planetary Computer"
+  maybe_versioned_prefix = "pcc-staging"
 
   # AKS ----------------------------------------------------------------------
   kubernetes_version                                   = "1.21.9"

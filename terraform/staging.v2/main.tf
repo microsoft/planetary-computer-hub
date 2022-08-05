@@ -1,8 +1,9 @@
 module "resources" {
-  source         = "../resources"
-  environment    = "staging"
-  region         = "West Europe"
-  version_number = "2"
+  source                 = "../resources"
+  environment            = "staging"
+  region                 = "West Europe"
+  version_number         = "2"
+  maybe_versioned_prefix = "pcc-staging-2"
   # subscription = "Planetary Computer"
 
   # AKS ----------------------------------------------------------------------
