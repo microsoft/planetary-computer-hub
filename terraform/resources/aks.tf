@@ -17,11 +17,11 @@ resource "azurerm_kubernetes_cluster" "pc_compute" {
     }
   }
 
+  # TODO(migration): remove remove this and just set to content
   # The "v0" deployments didn't have RBAC enabled. Having to specify it
   # as a dynamic block here.
-  # Remove this once we're done with the v0 deployments.
   dynamic "azure_active_directory_role_based_access_control" {
-    for_each = (var.aks_azure_active_direcotry_role_based_access_control ? {} : {})
+    for_each = [for b in [var.aks_azure_active_directory_role_based_access_control] : b if b]
     content {
       managed            = true
       azure_rbac_enabled = true

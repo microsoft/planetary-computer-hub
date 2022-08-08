@@ -132,11 +132,23 @@ To enable creating network security groups
 ```
 $ az role assignment create \
     --role "/subscriptions/<subscription-id>/providers/Microsoft.Authorization/roleDefinitions/4d97b98b-1d4f-4787-a291-c67834d212e7" \
-    --assginee "<service-principal-id>" \
+    --assignee "<service-principal-id>" \
     --scope="/subscriptions/<subscription-id>/resourceGroups/MC_pcc-staging-rg_pcc-staging-cluster_westeurope/providers/Microsoft.Network/routeTables/aks-agentpool-27180469-routetable"
 ```
 
 Likewise for production (change the resource group name in the scope).
+
+
+## AKS RBAC
+
+Requires the service principal executing terraform to also have permissions on the Kubernetes Cluster.
+
+```
+$ az role assignment create \
+    --role "Azure Kubernetes Service RBAC Writer" \
+    --scope "/subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/pcc-staging-2-rg/providers/Microsoft.ContainerService/managedClusters/pcc-staging-2-cluster" \
+    --assignee $ARM_CLIENT_ID
+```
 
 ## Velero backup configuration
 

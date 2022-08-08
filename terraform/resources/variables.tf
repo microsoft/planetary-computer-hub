@@ -27,7 +27,7 @@ variable "kubernetes_version" {
   description = "The Kubernetes version. Used in `aks.tf` in several places."
 }
 
-variable "aks_azure_active_direcotry_role_based_access_control" {
+variable "aks_azure_active_directory_role_based_access_control" {
   type        = bool
   description = "Whether to enabled managed Azure AD integration."
 }
@@ -173,6 +173,25 @@ variable "maybe_versioned_prefix" {
   type        = string
   description = "Temporary hack"
 }
+
+variable "azure_client_id" {
+  type        = string
+  default     = ""
+  description = "Temporary variable for dynamic provider."
+}
+
+variable "azure_client_secret" {
+  type        = string
+  default     = ""
+  description = "Temporary variable for dynamic provider."
+}
+
+variable "azure_tenant_id" {
+  type        = string
+  default     = ""
+  description = "Temporary variable for dynamic provider."
+}
+
 
 # -----------------
 # Local variables

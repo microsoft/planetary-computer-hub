@@ -7,7 +7,7 @@ module "resources" {
 
   # AKS ----------------------------------------------------------------------
   kubernetes_version                                   = "1.19.7"
-  aks_azure_active_direcotry_role_based_access_control = false
+  aks_azure_active_directory_role_based_access_control = false
   aks_automatic_channel_upgrade                        = null
 
   # 8GB of RAM, 4 CPU cores, ssd base disk
@@ -56,4 +56,3 @@ output "resources" {
 provider "azurerm" {
   features {}
 }
-

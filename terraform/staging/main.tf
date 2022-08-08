@@ -7,7 +7,7 @@ module "resources" {
 
   # AKS ----------------------------------------------------------------------
   kubernetes_version                                   = "1.21.9"
-  aks_azure_active_direcotry_role_based_access_control = false
+  aks_azure_active_directory_role_based_access_control = false
   aks_automatic_channel_upgrade                        = null
 
   # 2GiB of RAM, 1 CPU core

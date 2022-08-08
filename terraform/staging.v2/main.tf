@@ -8,7 +8,7 @@ module "resources" {
 
   # AKS ----------------------------------------------------------------------
   kubernetes_version                                   = null
-  aks_azure_active_direcotry_role_based_access_control = true
+  aks_azure_active_directory_role_based_access_control = true
   aks_automatic_channel_upgrade                        = "stable"
 
   # 2GiB of RAM, 1 CPU core
@@ -37,6 +37,10 @@ module "resources" {
   qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:3.18.0.1"
 
   kbatch_proxy_url = "http://dhub-staging-kbatch-proxy.staging.svc.cluster.local"
+
+  azure_client_id     = var.azure_client_id
+  azure_client_secret = var.azure_client_secret
+  azure_tenant_id     = var.azure_tenant_id
 }
 
 terraform {
@@ -52,3 +56,14 @@ output "resources" {
   value     = module.resources
   sensitive = true
 }
+
+variable "azure_client_id" {
+  type = string
+}
+variable "azure_client_secret" {
+  type = string
+}
+variable "azure_tenant_id" {
+  type = string
+}
+
