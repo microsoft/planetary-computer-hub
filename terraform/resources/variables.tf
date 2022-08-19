@@ -176,7 +176,6 @@ variable "maybe_versioned_prefix" {
 
 variable "azure_client_id" {
   type        = string
-  default     = ""
   description = "Temporary variable for dynamic provider."
 }
 

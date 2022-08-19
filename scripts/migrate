@@ -10,7 +10,7 @@
 
 # velero restore logs backup-2022.8.3.0-20220803094420
 # Message=\"The client 'cadf9d56-b930-499e-9dad-0e093705e853' with object id 'cadf9d56-b930-499e-9dad-0e093705e853' does not have authorization to perform action 'Microsoft.Compute/disks/write' over scope '/subscriptions/9da7523a-cb61-4c3e-b1d4-afa5fc6d2da9/resourceGroups/MC_pcc-staging-2-rg_pcc-stagin    g-2-cluster_westeurope/providers/Microsoft.Compute/disks/restore-0af3b536-1a33-4bbd-aac0-2a40cc874583' or the scope is invalid. If access was recently granted, please refresh your credentials.\"" logSource="pkg/controller/restore_controller.go:500" restore=velero/backup-2022.8.3.0-20220803094420
-# - Grant on the Cluster RG. Disk Pool Operator role
+# - Grant on the Cluster RG. "Disk Pool Operator" and "Disk Snapshot Contributor"
 
 
 # ./scripts/migrate backup-2022.8.3.0 pcc-staging-cluster pcc-staging-rg pcc-staging-2-cluster pcc-staging-2-rg staging

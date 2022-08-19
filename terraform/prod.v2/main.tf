@@ -9,7 +9,7 @@ module "resources" {
   # AKS ----------------------------------------------------------------------
   kubernetes_version                                   = null
   aks_azure_active_directory_role_based_access_control = true
-  aks_automatic_channel_upgrade                        = null
+  aks_automatic_channel_upgrade                        = "stable"
 
   # 8GB of RAM, 4 CPU cores, ssd base disk
   core_vm_size              = "Standard_E4s_v3"
@@ -37,6 +37,10 @@ module "resources" {
   qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:3.18.0.1"
 
   kbatch_proxy_url = "http://dhub-prod-kbatch-proxy.prod.svc.cluster.local"
+
+  azure_client_id     = var.azure_client_id
+  azure_client_secret = var.azure_client_secret
+  azure_tenant_id     = var.azure_tenant_id
 }
 
 terraform {
@@ -58,3 +62,13 @@ provider "azurerm" {
   features {}
 }
 
+# TODO(migration): Move to proper variables.
+variable "azure_client_id" {
+  type = string
+}
+variable "azure_client_secret" {
+  type = string
+}
+variable "azure_tenant_id" {
+  type = string
+}
