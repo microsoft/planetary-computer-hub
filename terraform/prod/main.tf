@@ -21,9 +21,9 @@ module "resources" {
 
   # DaskHub ------------------------------------------------------------------
   helm_chart                = "../../helm/chart"
-  dns_label                 = "pccompute"
+  dns_label                 = "pccompute-old"
   oauth_host                = "planetarycomputer"
-  jupyterhub_host           = "pccompute.westeurope.cloudapp.azure.com"
+  jupyterhub_host           = "pccompute-old.westeurope.cloudapp.azure.com"
   user_placeholder_replicas = 1
   stac_url                  = "https://planetarycomputer.microsoft.com/api/stac/v1/"
 
@@ -36,6 +36,11 @@ module "resources" {
   qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:3.18.0.1"
 
   kbatch_proxy_url = "http://dhub-prod-kbatch-proxy.prod.svc.cluster.local"
+
+  azure_client_id     = ""
+  azure_client_secret = ""
+  azure_tenant_id     = ""
+
 }
 
 terraform {

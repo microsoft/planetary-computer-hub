@@ -36,6 +36,11 @@ module "resources" {
   qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:3.18.0.1"
 
   kbatch_proxy_url = "http://dhub-staging-kbatch-proxy.staging.svc.cluster.local"
+
+  azure_client_id     = ""
+  azure_client_secret = ""
+  azure_tenant_id     = ""
+
 }
 
 terraform {

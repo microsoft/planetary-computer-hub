@@ -22,9 +22,9 @@ module "resources" {
 
   # DaskHub ------------------------------------------------------------------
   helm_chart                = "../../helm/chart.2"
-  dns_label                 = "pccompute-2"
+  dns_label                 = "pccompute"
   oauth_host                = "planetarycomputer"
-  jupyterhub_host           = "pccompute-2.westeurope.cloudapp.azure.com"
+  jupyterhub_host           = "pccompute.westeurope.cloudapp.azure.com"
   user_placeholder_replicas = 1
   stac_url                  = "https://planetarycomputer.microsoft.com/api/stac/v1/"
 

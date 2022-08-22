@@ -14,6 +14,7 @@
 
 
 # ./scripts/migrate backup-2022.8.3.0 pcc-staging-cluster pcc-staging-rg pcc-staging-2-cluster pcc-staging-2-rg staging
+# ./scripts/migrate backup-2022.8.20.0 pcc-westeurope-cluster pcc-westeurope-rg pcc-prod-2-cluster pcc-prod-2-rg prod
 
 set -eu
 
@@ -31,6 +32,12 @@ echo "[getting source kubeconfig]"
 az aks get-credentials --name $SOURCE_CLUSTER -g $SOURCE_RG --subscription="Planetary Computer" --file=source-kubeconfig
 echo "[getting target kubeconfig]"
 az aks get-credentials --name $TARGET_CLUSTER -g $TARGET_RG --subscription="Planetary Computer" --file=target-kubeconfig
+
+echo "[stopping source hub]"
+KUBECONFIG=source-kubeconfig kubectl -n $NAMESPACE scale deployment hub --replicas=0
+echo "[stopping notebook servers]"
+KUBECONFIG=target-kubeconfig kubectl -n prod delete pod -l app=jupyterhub,component=singleuser-server
+
 
 echo "[starting backup]"
 KUBECONFIG=source-kubeconfig velero backup create --include-namespaces=$NAMESPACE $BACKUP --include-resources pvc,pv -l app=jupyterhub --wait --kubeconfig=source-kubeconfig
