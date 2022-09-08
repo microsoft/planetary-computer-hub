@@ -1,17 +1,18 @@
 module "resources" {
-  source      = "../resources"
-  environment = "staging"
-  region      = "West Europe"
+  source                 = "../resources"
+  environment            = "staging"
+  region                 = "West Europe"
+  version_number         = "2"
+  maybe_versioned_prefix = "pcc-staging-2"
   # subscription = "Planetary Computer"
-  maybe_versioned_prefix = "pcc-staging"
 
   # AKS ----------------------------------------------------------------------
-  kubernetes_version                                   = "1.21.9"
-  aks_azure_active_directory_role_based_access_control = false
-  aks_automatic_channel_upgrade                        = null
+  kubernetes_version                                   = null
+  aks_azure_active_directory_role_based_access_control = true
+  aks_automatic_channel_upgrade                        = "stable"
 
   # 2GiB of RAM, 1 CPU core
-  core_vm_size              = "Standard_A2_v2"
+  core_vm_size              = "Standard_A4_v2"
   core_os_disk_type         = "Managed"
   user_pool_min_count       = 1
   cpu_worker_pool_min_count = 0
@@ -20,10 +21,9 @@ module "resources" {
   workspace_id = "83dcaf36e047a90f"
 
   # DaskHub ------------------------------------------------------------------
-  helm_chart                = "../../helm/chart"
-  dns_label                 = "pcc-staging-old"
+  dns_label                 = "pcc-staging"
   oauth_host                = "planetarycomputer-staging"
-  jupyterhub_host           = "pcc-staging-old.westeurope.cloudapp.azure.com"
+  jupyterhub_host           = "pcc-staging.westeurope.cloudapp.azure.com"
   user_placeholder_replicas = 0
   stac_url                  = "https://planetarycomputer-staging.microsoft.com/api/stac/v1/"
 
@@ -37,10 +37,9 @@ module "resources" {
 
   kbatch_proxy_url = "http://dhub-staging-kbatch-proxy.staging.svc.cluster.local"
 
-  azure_client_id     = ""
-  azure_client_secret = ""
-  azure_tenant_id     = ""
-
+  azure_client_id     = var.azure_client_id
+  azure_client_secret = var.azure_client_secret
+  azure_tenant_id     = var.azure_tenant_id
 }
 
 terraform {
@@ -48,7 +47,7 @@ terraform {
     resource_group_name  = "pc-manual-resources"
     storage_account_name = "pctfstate"
     container_name       = "pcc"
-    key                  = "staging.tfstate"
+    key                  = "staging-2.tfstate"
   }
 }
 
@@ -56,3 +55,14 @@ output "resources" {
   value     = module.resources
   sensitive = true
 }
+
+variable "azure_client_id" {
+  type = string
+}
+variable "azure_client_secret" {
+  type = string
+}
+variable "azure_tenant_id" {
+  type = string
+}
+

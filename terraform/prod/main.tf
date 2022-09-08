@@ -2,13 +2,14 @@ module "resources" {
   source                 = "../resources"
   environment            = "prod"
   region                 = "West Europe"
-  maybe_versioned_prefix = "pcc-westeurope"
+  version_number         = "2"
+  maybe_versioned_prefix = "pcc-prod-2"
   # subscription = "Planetary Computer"
 
   # AKS ----------------------------------------------------------------------
-  kubernetes_version                                   = "1.19.7"
-  aks_azure_active_directory_role_based_access_control = false
-  aks_automatic_channel_upgrade                        = null
+  kubernetes_version                                   = null
+  aks_azure_active_directory_role_based_access_control = true
+  aks_automatic_channel_upgrade                        = "stable"
 
   # 8GB of RAM, 4 CPU cores, ssd base disk
   core_vm_size              = "Standard_E4s_v3"
@@ -20,10 +21,9 @@ module "resources" {
   workspace_id = "225cedbd199c55da"
 
   # DaskHub ------------------------------------------------------------------
-  helm_chart                = "../../helm/chart"
-  dns_label                 = "pccompute-old"
+  dns_label                 = "pccompute"
   oauth_host                = "planetarycomputer"
-  jupyterhub_host           = "pccompute-old.westeurope.cloudapp.azure.com"
+  jupyterhub_host           = "pccompute.westeurope.cloudapp.azure.com"
   user_placeholder_replicas = 1
   stac_url                  = "https://planetarycomputer.microsoft.com/api/stac/v1/"
 
@@ -37,10 +37,9 @@ module "resources" {
 
   kbatch_proxy_url = "http://dhub-prod-kbatch-proxy.prod.svc.cluster.local"
 
-  azure_client_id     = ""
-  azure_client_secret = ""
-  azure_tenant_id     = ""
-
+  azure_client_id     = var.azure_client_id
+  azure_client_secret = var.azure_client_secret
+  azure_tenant_id     = var.azure_tenant_id
 }
 
 terraform {
@@ -48,7 +47,7 @@ terraform {
     resource_group_name  = "pc-manual-resources"
     storage_account_name = "pctfstate"
     container_name       = "pcc"
-    key                  = "common.tfstate" # TODO: migrate to prod.tfstate
+    key                  = "prod-2.tfstate" # TODO: migrate to prod.tfstate
   }
 }
 
@@ -60,4 +59,15 @@ output "resources" {
 # We require this, since we used to generate the pcccr ACR
 provider "azurerm" {
   features {}
+}
+
+# TODO(migration): Move to proper variables.
+variable "azure_client_id" {
+  type = string
+}
+variable "azure_client_secret" {
+  type = string
+}
+variable "azure_tenant_id" {
+  type = string
 }

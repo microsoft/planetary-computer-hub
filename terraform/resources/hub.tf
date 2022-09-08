@@ -13,12 +13,11 @@ resource "helm_release" "dhub" {
   name             = local.helm_release_name
   repository       = "./charts/pchub"
   version          = "1.0.0"
-  chart            = var.helm_chart
   namespace        = var.environment
   create_namespace = true
 
   values = [
-    "${templatefile("${var.helm_chart}/config.yaml", { oauth_host = var.oauth_host, jupyterhub_host = var.jupyterhub_host, namespace = var.environment, release = local.helm_release_name })}",
+    "${templatefile("../../helm/chart/config.yaml", { oauth_host = var.oauth_host, jupyterhub_host = var.jupyterhub_host, namespace = var.environment, release = local.helm_release_name })}",
     "${file("../../helm/jupyterhub_opencensus_monitor.yaml")}",
     "${templatefile("../../helm/profiles.yaml", { python_image = var.python_image, r_image = var.r_image, gpu_pytorch_image = var.gpu_pytorch_image, gpu_tensorflow_image = var.gpu_tensorflow_image, qgis_image = var.qgis_image })}",
     # workaround https://github.com/hashicorp/terraform-provider-helm/issues/669

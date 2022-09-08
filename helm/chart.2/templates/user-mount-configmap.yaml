@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: user-etc-singleuser
-data:
-  {{- (.Files.Glob "files/etc/singleuser/*.sh").AsConfig | nindent 2 }}

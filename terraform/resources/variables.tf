@@ -17,11 +17,6 @@ variable "version_number" {
   default     = ""
 }
 
-variable "helm_chart" {
-  type        = string
-  description = "The helm chart wrapping daskhub."
-}
-
 variable "kubernetes_version" {
   type        = string
   description = "The Kubernetes version. Used in `aks.tf` in several places."

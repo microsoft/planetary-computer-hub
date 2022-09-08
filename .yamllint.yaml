@@ -3,4 +3,3 @@ rules:
   line-length: disable
 ignore: |
   helm/chart/templates/
-  helm/chart.2/templates/
