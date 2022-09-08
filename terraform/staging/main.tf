@@ -21,9 +21,9 @@ module "resources" {
 
   # DaskHub ------------------------------------------------------------------
   helm_chart                = "../../helm/chart"
-  dns_label                 = "pcc-staging"
+  dns_label                 = "pcc-staging-old"
   oauth_host                = "planetarycomputer-staging"
-  jupyterhub_host           = "pcc-staging.westeurope.cloudapp.azure.com"
+  jupyterhub_host           = "pcc-staging-old.westeurope.cloudapp.azure.com"
   user_placeholder_replicas = 0
   stac_url                  = "https://planetarycomputer-staging.microsoft.com/api/stac/v1/"
 

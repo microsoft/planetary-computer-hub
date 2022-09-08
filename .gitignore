@@ -16,3 +16,4 @@ jupyterhub-proxy.pid
 .kubeconfig
 .venv
 *-kubeconfig
+mining
