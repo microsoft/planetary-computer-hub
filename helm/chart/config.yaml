@@ -28,7 +28,7 @@ daskhub:
               - podSelector:
                   matchLabels:
                     gateway.dask.org/instance: "${release}-dask-gateway"
-        
+
       config:
         JupyterHub:
           admin_access: false

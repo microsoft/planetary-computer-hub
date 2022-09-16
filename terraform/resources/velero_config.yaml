@@ -15,4 +15,4 @@ configuration:
     config:
       subscriptionId: ${subscriptionId}
       resourceGroup: pc-manual-resources
-      storageAccount: pchubbackup 
+      storageAccount: pchubbackup

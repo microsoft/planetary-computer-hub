@@ -203,7 +203,7 @@ locals {
 
   # maybe_versioned_prefix is
   #   - "pcc" for prod
-  #   - "pcc-staging" for staging 
+  #   - "pcc-staging" for staging
   #   - "pcc-staging-2" for staging v2
   #   - "pcc-prod-2" for staging v2
   # maybe_versioned_prefix = var.version_number == "" && var.environment == "prod" ? local.prefix : "${local.maybe_staging_prefix}-${var.version_number}"
