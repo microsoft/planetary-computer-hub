@@ -11,10 +11,27 @@ variable "region" {
   description = "The Azure region to deploy in. We choose 'West Europe' to match the data."
 }
 
+variable "version_number" {
+  type        = string
+  description = "The revisoin number of this deployment. Useful for migrating between AKS clusters."
+  default     = ""
+}
+
 variable "kubernetes_version" {
   type        = string
   description = "The Kubernetes version. Used in `aks.tf` in several places."
 }
+
+variable "aks_azure_active_directory_role_based_access_control" {
+  type        = bool
+  description = "Whether to enabled managed Azure AD integration."
+}
+
+variable "aks_automatic_channel_upgrade" {
+  type        = string
+  description = "automatic_channel_upgrade"
+}
+
 
 variable "oauth_host" {
   type        = string
@@ -87,6 +104,11 @@ variable "core_vm_size" {
   description = "The VM size to use for the default / core AKS nodepool."
 }
 
+variable "core_os_disk_type" {
+  type        = string
+  description = "The disk for staging. Smaller VMs must use 'Managed'."
+}
+
 variable "user_pool_min_count" {
   type        = number
   description = "The minimum number of workers for the CPU user nodepool."
@@ -141,6 +163,30 @@ variable "kbatch_proxy_url" {
   description = "URL (possibly kubernetes-internal) to the kbatch-server application."
 }
 
+
+variable "maybe_versioned_prefix" {
+  type        = string
+  description = "Temporary hack"
+}
+
+variable "azure_client_id" {
+  type        = string
+  description = "Temporary variable for dynamic provider."
+}
+
+variable "azure_client_secret" {
+  type        = string
+  default     = ""
+  description = "Temporary variable for dynamic provider."
+}
+
+variable "azure_tenant_id" {
+  type        = string
+  default     = ""
+  description = "Temporary variable for dynamic provider."
+}
+
+
 # -----------------
 # Local variables
 
@@ -151,4 +197,17 @@ locals {
   namespaced_prefix = "${local.stack_id}-${var.environment}"
   # maybe_staging_prefix is "pcc-staging" for staging, and "pcc" for prod
   maybe_staging_prefix = var.environment == "staging" ? local.namespaced_prefix : local.prefix
+
+  is_prod = var.environment == "prod"
+  is_v1   = var.version_number == ""
+
+  # maybe_versioned_prefix is
+  #   - "pcc" for prod
+  #   - "pcc-staging" for staging
+  #   - "pcc-staging-2" for staging v2
+  #   - "pcc-prod-2" for staging v2
+  # maybe_versioned_prefix = var.version_number == "" && var.environment == "prod" ? local.prefix : "${local.maybe_staging_prefix}-${var.version_number}"
+  # maybe_versioned_prefix = "${coalesce}"
+
+  helm_release_name = "dhub-${var.environment}"
 }

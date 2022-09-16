@@ -15,3 +15,5 @@ jupyterhub_cookie_secret
 jupyterhub-proxy.pid
 .kubeconfig
 .venv
+*-kubeconfig
+mining

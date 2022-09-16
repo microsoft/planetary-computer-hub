@@ -115,7 +115,10 @@ $ az keyvault secret set --vault-name pc-deploy-secrets --name '<prefix>--<key-n
 | pcc--azure-client-secret                   | Sets `daskhub.jupyterhub.hub.extraEnv.AZURE_CLIENT_SECRET`, an secret key to allow the hub to access Azure resources, enabling the API management integration |
 | pcc-staging--kbatch-server-api-token       | JupyterHub token for the kbatch application in staging.                                                                                                       |
 | pcc-prod--kbatch-server-api-token          | JupyterHub token for the kbatch application in production.                                                                                                    |
-
+| pcc--velero-azure-subscription-id          | Set in `velero_credentials.tpl` for backups / migrations                                                                                                      |
+| pcc--velero-azure-tenant-id                | Set in `velero_credentials.tpl` for backups / migrations                                                                                                      |
+| pcc--velero-azure-client-id                | Set in `velero_credentials.tpl` for backups / migrations                                                                                                      |
+| pcc--velero-azure-client-secret            | Set in `velero_credentials.tpl` for backups / migrations                                                                                                      |
 
 ## Continuous deployment
 
@@ -129,11 +132,29 @@ To enable creating network security groups
 ```
 $ az role assignment create \
     --role "/subscriptions/<subscription-id>/providers/Microsoft.Authorization/roleDefinitions/4d97b98b-1d4f-4787-a291-c67834d212e7" \
-    --assginee "<service-principal-id>" \
+    --assignee "<service-principal-id>" \
     --scope="/subscriptions/<subscription-id>/resourceGroups/MC_pcc-staging-rg_pcc-staging-cluster_westeurope/providers/Microsoft.Network/routeTables/aks-agentpool-27180469-routetable"
 ```
 
 Likewise for production (change the resource group name in the scope).
+
+
+## AKS RBAC
+
+Requires the service principal executing terraform to also have permissions on the Kubernetes Cluster.
+
+```
+$ az role assignment create \
+    --role "Azure Kubernetes Service RBAC Writer" \
+    --scope "/subscriptions/$ARM_SUBSCRIPTION_ID/resourceGroups/pcc-staging-2-rg/providers/Microsoft.ContainerService/managedClusters/pcc-staging-2-cluster" \
+    --assignee $ARM_CLIENT_ID
+```
+
+## Velero backup configuration
+
+The Terraform deployment also installs [velero](https://velero.io/) on the cluster via helm. See `velero.tf`.
+
+This requires the manual creation of some resources.
 
 ## Opencensus monitor service
 

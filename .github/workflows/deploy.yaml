@@ -1,72 +1,72 @@
-name: Deploy
-on:
-  push:
-    branches:
-      - main
-  release:
-    types:
-      - created
+# name: Deploy
+# on:
+#   push:
+#     branches:
+#       - main
+#   release:
+#     types:
+#       - created
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+#     timeout-minutes: 60
+#     steps:
 
-    - name: Set environment
-      id: environment
-      run: |
-        echo ${{ github.event_name }}
-        if [[ ${{ github.event_name == 'release' }} == true ]]; then
-          environment=prod
-        else
-          environment=staging
-        fi
-        echo "environment: ${environment}"
-        echo "::set-output name=environment::${environment}"
+#     - name: Set environment
+#       id: environment
+#       run: |
+#         echo ${{ github.event_name }}
+#         if [[ ${{ github.event_name == 'release' }} == true ]]; then
+#           environment=prod
+#         else
+#           environment=staging
+#         fi
+#         echo "environment: ${environment}"
+#         echo "::set-output name=environment::${environment}"
 
-    - uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+#     - uses: azure/login@v1
+#       with:
+#         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 2
+#     - uses: actions/checkout@v2
+#       with:
+#         fetch-depth: 2
 
-    - uses: hashicorp/setup-terraform@v1
-      with:
-        # We parse the output so set this flag
-        terraform_wrapper: false
+#     - uses: hashicorp/setup-terraform@v1
+#       with:
+#         # We parse the output so set this flag
+#         terraform_wrapper: false
 
-    - uses: azure/setup-helm@v1
+#     - uses: azure/setup-helm@v1
 
-    - name: Azure CLI script
-      env:
-        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-        PROD_TEST_BOT_TOKEN: ${{ secrets.PROD_TEST_BOT_TOKEN }}
-        STAGING_TEST_BOT_TOKEN: ${{ secrets.STAGING_TEST_BOT_TOKEN }}
-      run: |
-        export ENVIRONMENT=${{ steps.environment.outputs.environment }}
-        echo "[Deploying ${ENVIRONMENT}]"
-        # # export subscriptionId=$(subscriptionId)
-        # # # For Terraform
+#     - name: Azure CLI script
+#       env:
+#         ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+#         ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+#         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+#         ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+#         PROD_TEST_BOT_TOKEN: ${{ secrets.PROD_TEST_BOT_TOKEN }}
+#         STAGING_TEST_BOT_TOKEN: ${{ secrets.STAGING_TEST_BOT_TOKEN }}
+#       run: |
+#         export ENVIRONMENT=${{ steps.environment.outputs.environment }}
+#         echo "[Deploying ${ENVIRONMENT}]"
+#         # # export subscriptionId=$(subscriptionId)
+#         # # # For Terraform
 
-        # # For Azure CLI
-        # export AZURE_TENANT_ID=${tenantId}
-        # export AZURE_CLIENT_ID=${servicePrincipalId}
-        # export AZURE_CLIENT_SECRET=${servicePrincipalKey}
+#         # # For Azure CLI
+#         # export AZURE_TENANT_ID=${tenantId}
+#         # export AZURE_CLIENT_ID=${servicePrincipalId}
+#         # export AZURE_CLIENT_SECRET=${servicePrincipalKey}
 
-        if [[ ${ENVIRONMENT} == "prod" ]]; then
-          export TEST_BOT_TOKEN=${PROD_TEST_BOT_TOKEN}
-          export JUPYTERHUB_URL="https://pccompute.westeurope.cloudapp.azure.com/compute"
-        else
-          export TEST_BOT_TOKEN=${STAGING_TEST_BOT_TOKEN}
-          export JUPYTERHUB_URL="https://pcc-staging.westeurope.cloudapp.azure.com/compute"
-        fi
+#         if [[ ${ENVIRONMENT} == "prod" ]]; then
+#           export TEST_BOT_TOKEN=${PROD_TEST_BOT_TOKEN}
+#           export JUPYTERHUB_URL="https://pccompute.westeurope.cloudapp.azure.com/compute"
+#         else
+#           export TEST_BOT_TOKEN=${STAGING_TEST_BOT_TOKEN}
+#           export JUPYTERHUB_URL="https://pcc-staging.westeurope.cloudapp.azure.com/compute"
+#         fi
 
-        echo [JUPYTERHUB_URL $JUPYTERHUB_URL]
-        sh ./scripts/setup
-        sh ./scripts/deploy
+#         echo [JUPYTERHUB_URL $JUPYTERHUB_URL]
+#         sh ./scripts/setup
+#         sh ./scripts/deploy
