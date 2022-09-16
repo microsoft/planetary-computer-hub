@@ -13,6 +13,7 @@ resource "helm_release" "dhub" {
   name             = local.helm_release_name
   repository       = "./charts/pchub"
   version          = "1.0.0"
+  chart            = "../../helm/chart"
   namespace        = var.environment
   create_namespace = true
 
