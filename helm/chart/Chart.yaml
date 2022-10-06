@@ -10,7 +10,7 @@ dependencies:
     version: "2022.6.0"
     repository: https://helm.dask.org
   - name: kbatch-proxy
-    version: "0.2.14"
+    version: "0.4.1"
     repository: https://kbatch-dev.github.io/helm-chart/
   # cryptnono, counters crypto mining
   # Source code: https://github.com/yuvipanda/cryptnono/
