@@ -1,0 +1,7 @@
+daskhub:
+  jupyterhub:
+    ingress:
+      enabled: true
+      ingressClassName: "azure-application-gateway"
+      tls:
+        - secretName: "${secret_name}"

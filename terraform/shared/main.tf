@@ -37,6 +37,7 @@ resource "azurerm_resource_group" "shared" {
   tags = {
     "ringValue" = "r1"
   }
+  provider = azurerm.pc
 }
 
 resource "azurerm_storage_account" "pc-compute" {

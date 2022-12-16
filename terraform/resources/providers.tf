@@ -2,6 +2,22 @@ provider "azurerm" {
   features {}
 }
 
+provider "azurerm" {
+  subscription_id = "9da7523a-cb61-4c3e-b1d4-afa5fc6d2da9"
+  alias           = "pc"
+
+  features {}
+}
+
+
+provider "azurerm" {
+  subscription_id = "a84a690d-585b-4c7c-80d9-851a48af5a50"
+  alias           = "pct"
+
+  features {}
+}
+
+
 provider "helm" {
   # https://dev.to/danielepolencic/getting-started-with-terraform-and-kubernetes-on-azure-aks-3l4d
   kubernetes {
@@ -58,7 +74,7 @@ terraform {
 
     helm = {
       source  = "hashicorp/helm"
-      version = "2.6.0"
+      version = "2.13.2"
     }
 
   }

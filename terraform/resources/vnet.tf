@@ -13,25 +13,30 @@ resource "azurerm_subnet" "node_subnet" {
   address_prefixes     = ["10.1.0.0/16"]
 }
 
+resource "azurerm_subnet" "ag_subnet" {
+  name                 = "${var.maybe_versioned_prefix}-ag-subnet"
+  virtual_network_name = azurerm_virtual_network.pc_compute.name
+  resource_group_name  = azurerm_resource_group.pc_compute.name
+  address_prefixes     = ["10.2.0.0/16"]
+  service_endpoints    = ["Microsoft.KeyVault"]
+}
+
 resource "azurerm_network_security_group" "pc_compute" {
   name                = "${var.maybe_versioned_prefix}-security-group"
   location            = azurerm_resource_group.pc_compute.location
   resource_group_name = azurerm_resource_group.pc_compute.name
-
-  security_rule {
-    name                       = "hub-rule"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_ranges    = ["80", "443"]
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
 }
 
-resource "azurerm_subnet_network_security_group_association" "pc_compute" {
-  subnet_id                 = azurerm_subnet.node_subnet.id
-  network_security_group_id = azurerm_network_security_group.pc_compute.id
+resource "azurerm_public_ip" "pc_compute" {
+  name                = var.pip_name
+  resource_group_name = azurerm_resource_group.pc_compute.name
+  location            = azurerm_resource_group.pc_compute.location
+  allocation_method   = "Static"
+  sku                 = "Standard"
+  domain_name_label   = var.dns_label
+}
+
+data "azurerm_application_gateway" "pc_compute" {
+  name                = var.appgw_name
+  resource_group_name = azurerm_resource_group.pc_compute.name
 }
