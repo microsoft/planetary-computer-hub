@@ -1,0 +1,5 @@
+azure-mgmt-apimanagement
+azure-identity
+opencensus-ext-azure
+opencensus
+httpx
