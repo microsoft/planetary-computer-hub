@@ -75,19 +75,19 @@ def count_notebook_servers(data: list):
     return server_count
 
 
-def compute_durations(users_start_times: Dict[str, datetime.datetime], data: list) -> List[int]:
+def compute_durations(users_start_times: Dict[str, datetime.datetime], data: list) -> List[tuple[str, int]]:
     current_users = {user["name"] for user in data}
     previous_users = set(users_start_times)
     dropped_users = previous_users - current_users
     new_users = current_users - previous_users
 
     now = datetime.datetime.utcnow()
-    durations = []
+    users_durations = []
 
     for user in dropped_users:
         start_time = users_start_times.pop(user)  # mutates in place!
         duration = now - start_time
-        durations.append(int(duration.total_seconds()))
+        users_durations.append((user, int(duration.total_seconds())))
 
     for user in data:
         if user["name"] in new_users:
@@ -95,7 +95,7 @@ def compute_durations(users_start_times: Dict[str, datetime.datetime], data: lis
             server = user["servers"][""]
             users_start_times[user["name"]] = datetime.datetime.strptime(server["started"], DATE_FORMAT) 
 
-    return durations
+    return users_durations
 
 
 async def main():
@@ -131,10 +131,10 @@ async def main():
                 measurement_map.measure_int_put(server_count_measure, count)
                 measurement_map.record(tag_map)
 
-            durations = compute_durations(users_start_times, data)
+            users_durations = compute_durations(users_start_times, data)
 
-            for duration in durations:
-                azlogger.info("duration %d", duration, extra={"custom_dimensions": {"duration": duration}})
+            for user_duration in users_durations:
+                azlogger.info("duration %d", user_duration[1], extra={"custom_dimensions": {"duration": user_duration[1], "user_name": user_duration[0]}})
 
             logger.debug("Sleeping for %d", INTERVAL)
             await asyncio.sleep(INTERVAL)
