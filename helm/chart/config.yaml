@@ -310,10 +310,10 @@ daskhub:
 
       extraConfig:
         01-idle: |
-          c.KubeClusterConfig.idle_timeout = 20 * 60  # seconds
-          c.KubeClusterConfig.cluster_max_cores = 400  # 50 nodes @ 8 workers / node, 1 core / worker
-          c.KubeClusterConfig.cluster_max_memory = "3200 G"  # 8 GiB / core
-          c.KubeClusterConfig.cluster_max_workers = 400  # 1 core, 8 GiB / worker
+          c.KubeClusterConfig.idle_timeout = 10 * 60  # seconds
+          c.KubeClusterConfig.cluster_max_cores = 100  # 50 nodes @ 8 workers / node, 1 core / worker
+          c.KubeClusterConfig.cluster_max_memory = "800 G"  # 8 GiB / core
+          c.KubeClusterConfig.cluster_max_workers = 100  # 1 core, 8 GiB / worker
 
         02-optionHandler: |
             from dask_gateway_server.options import Options, Float, String, Mapping, Bool

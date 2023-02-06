@@ -33,7 +33,7 @@ azlogger.addHandler(handler)
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 __version__ = "0.1.0"
-INTERVAL = 5  # seconds
+INTERVAL = 60  # seconds
 
 # ---- Metrics configuration ----
 # We collect / record by counts by profile, so create one TagMap per profile.
