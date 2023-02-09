@@ -4,7 +4,7 @@ Opencensus monitor for JupyterHub as a JupyterHub service.
 import asyncio
 import datetime
 import logging
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import os
 from collections import Counter, defaultdict
 
@@ -75,7 +75,7 @@ def count_notebook_servers(data: list):
     return server_count
 
 
-def compute_durations(users_start_times: Dict[str, datetime.datetime], data: list) -> List[tuple[str, int]]:
+def compute_durations(users_start_times: Dict[str, datetime.datetime], data: list) -> List[Tuple[str, int]]:
     current_users = {user["name"] for user in data}
     previous_users = set(users_start_times)
     dropped_users = previous_users - current_users
