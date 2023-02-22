@@ -7,26 +7,22 @@ resource "azurerm_kubernetes_cluster" "pc_compute" {
   sku_tier                  = "Paid"
   automatic_channel_upgrade = var.aks_automatic_channel_upgrade
 
-  addon_profile {
-    kube_dashboard {
-      enabled = false
-    }
-    oms_agent {
-      enabled                    = true
-      log_analytics_workspace_id = azurerm_log_analytics_workspace.pc_compute.id
-    }
+  oms_agent {
+    log_analytics_workspace_id = azurerm_log_analytics_workspace.pc_compute.id
   }
 
-  # TODO(migration): remove remove this and just set to content
-  # The "v0" deployments didn't have RBAC enabled. Having to specify it
-  # as a dynamic block here.
-  dynamic "azure_active_directory_role_based_access_control" {
-    for_each = [for b in [var.aks_azure_active_directory_role_based_access_control] : b if b]
-    content {
-      managed            = true
-      azure_rbac_enabled = true
-    }
+  microsoft_defender {
+    log_analytics_workspace_id = data.azurerm_key_vault_secret.microsoft_defender_log_analytics_workspace_id.value
   }
+
+  azure_active_directory_role_based_access_control {
+    managed            = true
+    azure_rbac_enabled = true
+  }
+
+  # Just setting this to match the preview default. Maybe enable in the future.
+  image_cleaner_enabled        = false
+  image_cleaner_interval_hours = 48
 
   # Core node-pool
   default_node_pool {
@@ -86,7 +82,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "user_pool" {
   min_count = var.user_pool_min_count
   max_count = 100
 
-  availability_zones = []
+  zones = []
 
   tags = {
     Environment = "Production"
