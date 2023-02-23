@@ -27,6 +27,7 @@ resource "azurerm_application_insights" "pc_compute" {
   name                = "pc-compute-appinsights"
   location            = azurerm_resource_group.pc_compute.location
   resource_group_name = azurerm_resource_group.pc_compute.name
+  workspace_id        = azurerm_log_analytics_workspace.pc_compute.id
   application_type    = "other"
   tags                = {}
 }
