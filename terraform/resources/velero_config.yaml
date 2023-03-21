@@ -1,18 +1,18 @@
-# Velero backup configuration
-# This resource was created manually ahead of time.
-initContainers:
-  - name: velero-plugin-for-microsoft-azure
-    image: velero/velero-plugin-for-microsoft-azure:v1.5.0
-    imagePullPolicy: IfNotPresent
-    volumeMounts:
-      - mountPath: /target
-        name: plugins
+# # Velero backup configuration
+# # This resource was created manually ahead of time.
+# initContainers:
+#   - name: velero-plugin-for-microsoft-azure
+#     image: velero/velero-plugin-for-microsoft-azure:v1.5.0
+#     imagePullPolicy: IfNotPresent
+#     volumeMounts:
+#       - mountPath: /target
+#         name: plugins
 
-configuration:
-  provider: azure
-  backupStorageLocation:
-    bucket: velero
-    config:
-      subscriptionId: ${subscriptionId}
-      resourceGroup: pc-manual-resources
-      storageAccount: pchubbackup
+# configuration:
+#   provider: azure
+#   backupStorageLocation:
+#     bucket: velero
+#     config:
+#       subscriptionId: ${subscriptionId}
+#       resourceGroup: pc-manual-resources
+#       storageAccount: pchubbackup
