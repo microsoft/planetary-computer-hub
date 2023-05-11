@@ -49,6 +49,12 @@ Hidden=false
 EOF
 
 
+echo "Disabling news"
+mkdir -p /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/
+cat <<EOF > /home/jovyan/.jupyter/lab/user-settings/@jupyterlab/apputils-extension/notification.jupyterlab-settings
+{"fetchNews": "false"}
+EOF
+
 echo "Removing lost+found"
 # Remove empty lost+found directories
 rmdir ~/lost+found/ || true
