@@ -111,21 +111,3 @@ daskhub:
                   operator: NotIn
                   values:
                   - gpu
-
-        - display_name: "CPU - Python (preview)"
-          default: "True"
-          description: '4 cores, 32 GiB of memory. <a href="https://github.com/pangeo-data/pangeo-docker-images">Pangeo Notebook</a> environment.'
-          kubespawner_override:
-            image: "pcccr.azurecr.io/public/planetary-computer/python:2023.5.3.0"
-            cpu_guarantee: 3
-            cpu_limit: 4
-            mem_guarantee: "25G"
-            mem_limit: "32G"
-            extra_resource_limits: {"nvidia.com/gpu": "0"}
-            default_url: "/lab/tree/PlanetaryComputerExamples/README.md"
-            node_affinity_required:
-              - matchExpressions:
-                - key: pc.microsoft.com/userkind
-                  operator: NotIn
-                  values:
-                  - gpu
