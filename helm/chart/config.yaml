@@ -241,6 +241,9 @@ daskhub:
         # GDAL / Rasterio environment variables for performance
         GDAL_DISABLE_READDIR_ON_OPEN: "EMPTY_DIR"
         GDAL_HTTP_MERGE_CONSECUTIVE_RANGES: "YES"
+        # Retry on Blob Storage errors
+        GDAL_HTTP_MAX_RETRY: "5"
+        GDAL_HTTP_RETRY_DELAY: "3"
 
       lifecycleHooks:
         postStart:
@@ -430,7 +433,9 @@ daskhub:
 
                 default_env = {
                     "GDAL_DISABLE_READDIR_ON_OPEN": "EMPTY_DIR",
-                    "GDAL_HTTP_MERGE_CONSECUTIVE_RANGES": "YES"
+                    "GDAL_HTTP_MERGE_CONSECUTIVE_RANGES": "YES",
+                    "GDAL_HTTP_MAX_RETRY": "5",
+                    "GDAL_HTTP_RETRY_DELAY": "3",
                 }
                 return Options(
                     Float("worker_cores", 1, min=0.1, max=8, label="Worker Cores"),
