@@ -36,24 +36,24 @@ resource "helm_release" "dhub" {
   # }
 
   set {
-    name  = "daskhub.jupyterhub.hub.config.GenericOAuthenticator.oauth_callback_url"
+    name  = "daskhub.jupyterhub.hub.config.Auth0OAuthenticator.oauth_callback_url"
     value = "https://${var.jupyterhub_host}/compute/hub/oauth_callback"
   }
 
   set {
-    name  = "daskhub.jupyterhub.hub.config.GenericOAuthenticator.client_secret"
-    value = data.azurerm_key_vault_secret.id_client_secret.value
+    name  = "daskhub.jupyterhub.hub.config.Auth0OAuthenticator.client_secret"
+    value = data.azurerm_key_vault_secret.autho_client_secret.value
   }
 
-  set {
-    name  = "daskhub.jupyterhub.hub.extraEnv.AZURE_CLIENT_SECRET"
-    value = data.azurerm_key_vault_secret.azure_client_secret.value
-  }
+  # set {
+  #   name  = "daskhub.jupyterhub.hub.extraEnv.AZURE_CLIENT_SECRET"
+  #   value = data.azurerm_key_vault_secret.azure_client_secret.value
+  # }
 
-  set {
-    name  = "daskhub.jupyterhub.hub.extraEnv.PC_ID_TOKEN"
-    value = data.azurerm_key_vault_secret.pc_id_token.value
-  }
+  # set {
+  #   name  = "daskhub.jupyterhub.hub.extraEnv.PC_ID_TOKEN"
+  #   value = data.azurerm_key_vault_secret.pc_id_token.value
+  # }
 
   set {
     name  = "daskhub.jupyterhub.hub.extraEnv.APPLICATIONINSIGHTS_CONNECTION_STRING"
@@ -145,7 +145,7 @@ resource "helm_release" "dhub" {
 
 }
 
-data "azurerm_storage_account" "pc-compute" {
-  name                = "${replace(local.prefix, "-", "")}storage"
-  resource_group_name = "${local.prefix}-shared-rg"
-}
+# data "azurerm_storage_account" "pc-compute" {
+#   name                = "${replace(local.prefix, "-", "")}storage"
+#   resource_group_name = "${local.prefix}-shared-rg"
+# }

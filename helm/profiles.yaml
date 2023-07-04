@@ -21,93 +21,93 @@ daskhub:
                   values:
                   - gpu
 
-        # R --------------------------------------------------------------------
-        - display_name: "R"
-          description: '8 cores, 64 GiB of memory. R geospatial environment.'
-          kubespawner_override:
-            image: "${r_image}"
-            cpu_guarantee: 7.0
-            cpu_limit: 8
-            mem_guarantee: "54G"
-            mem_limit: "59G"
-            extra_resource_limits: {"nvidia.com/gpu": "0"}
-            default_url: "/lab/tree/PlanetaryComputerExamples/README.md"
-            node_affinity_required:
-              - matchExpressions:
-                - key: pc.microsoft.com/userkind
-                  operator: NotIn
-                  values:
-                  - gpu
+        # # R --------------------------------------------------------------------
+        # - display_name: "R"
+        #   description: '8 cores, 64 GiB of memory. R geospatial environment.'
+        #   kubespawner_override:
+        #     image: "${r_image}"
+        #     cpu_guarantee: 7.0
+        #     cpu_limit: 8
+        #     mem_guarantee: "54G"
+        #     mem_limit: "59G"
+        #     extra_resource_limits: {"nvidia.com/gpu": "0"}
+        #     default_url: "/lab/tree/PlanetaryComputerExamples/README.md"
+        #     node_affinity_required:
+        #       - matchExpressions:
+        #         - key: pc.microsoft.com/userkind
+        #           operator: NotIn
+        #           values:
+        #           - gpu
 
-        # gpu-pytorch -------------------------------------------------------------
-        - display_name: "GPU - PyTorch"
-          description: '4 cores, 28 GiB of memory, <a href="https://docs.microsoft.com/en-us/azure/virtual-machines/nct4-v3-series">T4 GPU</a>. This has a longer startup time.'
-          kubespawner_override:
-            cpu_guarantee: 3.0
-            cpu_limit: 4
-            image: "${gpu_pytorch_image}"
-            mem_limit: "27G"
-            mem_guarantee: "20G"
-            extra_resource_limits: {"nvidia.com/gpu": "1"}
-            default_url: "/lab/tree/PlanetaryComputerExamples/README.md"
-            tolerations:
-              - key: 'nvidia.com/gpu'
-                operator: 'Equal'
-                value: 'present'
-                effect: 'NoSchedule'
-              - key: 'hub.jupyter.org_dedicated'
-                operator: 'Equal'
-                value: 'user'
-                effect: 'NoSchedule'
-            node_affinity_required:
-              - matchExpressions:
-                - key: pc.microsoft.com/userkind
-                  operator: In
-                  values:
-                  - gpu
+        # # gpu-pytorch -------------------------------------------------------------
+        # - display_name: "GPU - PyTorch"
+        #   description: '4 cores, 28 GiB of memory, <a href="https://docs.microsoft.com/en-us/azure/virtual-machines/nct4-v3-series">T4 GPU</a>. This has a longer startup time.'
+        #   kubespawner_override:
+        #     cpu_guarantee: 3.0
+        #     cpu_limit: 4
+        #     image: "${gpu_pytorch_image}"
+        #     mem_limit: "27G"
+        #     mem_guarantee: "20G"
+        #     extra_resource_limits: {"nvidia.com/gpu": "1"}
+        #     default_url: "/lab/tree/PlanetaryComputerExamples/README.md"
+        #     tolerations:
+        #       - key: 'nvidia.com/gpu'
+        #         operator: 'Equal'
+        #         value: 'present'
+        #         effect: 'NoSchedule'
+        #       - key: 'hub.jupyter.org_dedicated'
+        #         operator: 'Equal'
+        #         value: 'user'
+        #         effect: 'NoSchedule'
+        #     node_affinity_required:
+        #       - matchExpressions:
+        #         - key: pc.microsoft.com/userkind
+        #           operator: In
+        #           values:
+        #           - gpu
 
-        # gpu-tensorflow ----------------------------------------------------------
-        - display_name: "GPU - Tensorflow"
-          description: '4 cores, 28 GiB of memory, <a href="https://docs.microsoft.com/en-us/azure/virtual-machines/nct4-v3-series">T4 GPU</a>. This has a longer startup time.'
-          kubespawner_override:
-            cpu_guarantee: 3.0
-            cpu_limit: 4
-            image: "${gpu_tensorflow_image}"
-            mem_limit: "27G"
-            mem_guarantee: "20G"
-            extra_resource_limits: {"nvidia.com/gpu": "1"}
-            default_url: "/lab/tree/PlanetaryComputerExamples/README.md"
-            tolerations:
-              - key: 'nvidia.com/gpu'
-                operator: 'Equal'
-                value: 'present'
-                effect: 'NoSchedule'
-              - key: 'hub.jupyter.org_dedicated'
-                operator: 'Equal'
-                value: 'user'
-                effect: 'NoSchedule'
-            node_affinity_required:
-              - matchExpressions:
-                - key: pc.microsoft.com/userkind
-                  operator: In
-                  values:
-                  - gpu
+        # # gpu-tensorflow ----------------------------------------------------------
+        # - display_name: "GPU - Tensorflow"
+        #   description: '4 cores, 28 GiB of memory, <a href="https://docs.microsoft.com/en-us/azure/virtual-machines/nct4-v3-series">T4 GPU</a>. This has a longer startup time.'
+        #   kubespawner_override:
+        #     cpu_guarantee: 3.0
+        #     cpu_limit: 4
+        #     image: "${gpu_tensorflow_image}"
+        #     mem_limit: "27G"
+        #     mem_guarantee: "20G"
+        #     extra_resource_limits: {"nvidia.com/gpu": "1"}
+        #     default_url: "/lab/tree/PlanetaryComputerExamples/README.md"
+        #     tolerations:
+        #       - key: 'nvidia.com/gpu'
+        #         operator: 'Equal'
+        #         value: 'present'
+        #         effect: 'NoSchedule'
+        #       - key: 'hub.jupyter.org_dedicated'
+        #         operator: 'Equal'
+        #         value: 'user'
+        #         effect: 'NoSchedule'
+        #     node_affinity_required:
+        #       - matchExpressions:
+        #         - key: pc.microsoft.com/userkind
+        #           operator: In
+        #           values:
+        #           - gpu
 
 
-        # QGIS -----------------------------------------------------------------
-        - display_name: "QGIS (preview)"
-          description: '4 cores, 32 GiB of memory. QGIS geospatial environment. Currently in preview mode. <a ref="mailto:planetarycomputer@microsoft.com">Contact us</a> with feedback.'
-          kubespawner_override:
-            image: "${qgis_image}"
-            cpu_guarantee: 3
-            cpu_limit: 4
-            mem_guarantee: "24G"
-            mem_limit: "30G"
-            extra_resource_limits: {"nvidia.com/gpu": "0"}
-            default_url: "/desktop"
-            node_affinity_required:
-              - matchExpressions:
-                - key: pc.microsoft.com/userkind
-                  operator: NotIn
-                  values:
-                  - gpu
+        # # QGIS -----------------------------------------------------------------
+        # - display_name: "QGIS (preview)"
+        #   description: '4 cores, 32 GiB of memory. QGIS geospatial environment. Currently in preview mode. <a ref="mailto:planetarycomputer@microsoft.com">Contact us</a> with feedback.'
+        #   kubespawner_override:
+        #     image: "${qgis_image}"
+        #     cpu_guarantee: 3
+        #     cpu_limit: 4
+        #     mem_guarantee: "24G"
+        #     mem_limit: "30G"
+        #     extra_resource_limits: {"nvidia.com/gpu": "0"}
+        #     default_url: "/desktop"
+        #     node_affinity_required:
+        #       - matchExpressions:
+        #         - key: pc.microsoft.com/userkind
+        #           operator: NotIn
+        #           values:
+        #           - gpu

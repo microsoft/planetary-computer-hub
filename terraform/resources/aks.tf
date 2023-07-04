@@ -11,9 +11,9 @@ resource "azurerm_kubernetes_cluster" "pc_compute" {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.pc_compute.id
   }
 
-  microsoft_defender {
-    log_analytics_workspace_id = data.azurerm_key_vault_secret.microsoft_defender_log_analytics_workspace_id.value
-  }
+  # microsoft_defender {
+  #   log_analytics_workspace_id = data.azurerm_key_vault_secret.microsoft_defender_log_analytics_workspace_id.value
+  # }
 
   azure_active_directory_role_based_access_control {
     managed            = true

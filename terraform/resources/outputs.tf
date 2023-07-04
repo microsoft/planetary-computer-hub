@@ -7,19 +7,19 @@ output "location" {
 }
 
 output "id_client_secret" {
-  value     = data.azurerm_key_vault_secret.id_client_secret.value
+  value     = data.azurerm_key_vault_secret.autho_client_secret
   sensitive = true
 }
 
-output "azure_client_secret" {
-  value     = data.azurerm_key_vault_secret.azure_client_secret.value
-  sensitive = true
-}
+# output "azure_client_secret" {
+#   value     = data.azurerm_key_vault_secret.azure_client_secret.value
+#   sensitive = true
+# }
 
-output "pc_id_token" {
-  value     = data.azurerm_key_vault_secret.pc_id_token.value
-  sensitive = true
-}
+# output "pc_id_token" {
+#   value     = data.azurerm_key_vault_secret.pc_id_token.value
+#   sensitive = true
+# }
 
 output "jupyterhub_proxy_secret_token" {
   value     = data.azurerm_key_vault_secret.jupyterhub_proxy_secret_token.value
