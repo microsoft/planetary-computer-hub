@@ -88,7 +88,7 @@ daskhub:
         # mylabels: |
         #   c.KubeSpawner.extra_labels = {}
         kubespawner: |
-          c.KubeSpawner.start_timeout = 20 * 60  # 20 minutes
+          c.KubeSpawner.start_timeout = 25 * 60  # 25 minutes
         01-add-dask-gateway-values: |
           # The daskhub helm chart doesn't correctly handle hub.baseUrl.
           # DASK_GATEWAY__PUBLIC_ADDRESS set via terraform
