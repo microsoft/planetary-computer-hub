@@ -8,12 +8,13 @@ daskhub:
       podPriority:
         enabled: true
       userScheduler:
-        enabled: true
+        enabled: false
       corePods:
         nodeAffinity:
           matchNodePurpose: "require"
 
     hub:
+      consecutiveFailureLimit: 0
       baseUrl: "/compute/"
       image:
         name: pcccr.azurecr.io/jupyterhub/k8s-hub
