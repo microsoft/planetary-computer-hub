@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "3"
+    meta.helm.sh/release-name: dhub-prod
+    meta.helm.sh/release-namespace: prod
+  creationTimestamp: "2022-08-16T16:02:42Z"
+  generation: 3
+  labels:
+    app: jupyterhub
+    app.kubernetes.io/managed-by: Helm
+    chart: jupyterhub-1.2.0
+    component: user-scheduler
+    heritage: Helm
+    release: dhub-prod
+  name: user-scheduler
+  namespace: prod
+  resourceVersion: "295855469"
+  uid: ccbd0e2f-06a9-48a9-9421-ed9b1f9a993f
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: jupyterhub
+      component: user-scheduler
+      release: dhub-prod
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/config-map: c7d98ab9b80e2ae836bb02eacbc3a3e781a88e7dc8144ab35516fc57e58c077e
+      creationTimestamp: null
+      labels:
+        app: jupyterhub
+        component: user-scheduler
+        release: dhub-prod
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: hub.jupyter.org/node-purpose
+                operator: In
+                values:
+                - core
+      containers:
+      - command:
+        - /usr/local/bin/kube-scheduler
+        - --config=/etc/user-scheduler/config.yaml
+        - --authentication-skip-lookup=true
+        - --v=4
+        image: k8s.gcr.io/kube-scheduler:v1.19.13
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 10251
+            scheme: HTTPS
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: kube-scheduler
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 10251
+            scheme: HTTPS
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsGroup: 65534
+          runAsUser: 65534
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/user-scheduler
+          name: config
+      dnsPolicy: ClusterFirst
+      priorityClassName: dhub-prod-default-priority
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: user-scheduler
+      serviceAccountName: user-scheduler
+      terminationGracePeriodSeconds: 30
+      tolerations:
+      - effect: NoSchedule
+        key: hub.jupyter.org/dedicated
+        operator: Equal
+        value: core
+      - effect: NoSchedule
+        key: hub.jupyter.org_dedicated
+        operator: Equal
+        value: core
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: user-scheduler
+        name: config
+status:
+  conditions:
+  - lastTransitionTime: "2023-03-20T21:00:53Z"
+    lastUpdateTime: "2023-03-20T21:00:53Z"
+    message: ReplicaSet "user-scheduler-5c9b8c4778" has timed out progressing.
+    reason: ProgressDeadlineExceeded
+    status: "False"
+    type: Progressing
+  - lastTransitionTime: "2023-03-22T09:31:56Z"
+    lastUpdateTime: "2023-03-22T09:31:56Z"
+    message: Deployment does not have minimum availability.
+    reason: MinimumReplicasUnavailable
+    status: "False"
+    type: Available
+  observedGeneration: 3
+  replicas: 3
+  unavailableReplicas: 3
+  updatedReplicas: 1
