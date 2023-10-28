@@ -4,7 +4,7 @@ resource "azurerm_kubernetes_cluster" "pc_compute" {
   resource_group_name       = azurerm_resource_group.pc_compute.name
   dns_prefix                = "${var.maybe_versioned_prefix}-cluster"
   kubernetes_version        = var.kubernetes_version
-  sku_tier                  = "Paid"
+  sku_tier                  = "Standard"
   automatic_channel_upgrade = var.aks_automatic_channel_upgrade
 
   oms_agent {
@@ -41,9 +41,8 @@ resource "azurerm_kubernetes_cluster" "pc_compute" {
       "hub.jupyter.org/node-purpose" = "core"
     }
 
-    orchestrator_version = var.kubernetes_version
-
-    temporary_name_for_rotation = "tmpdefault"
+    orchestrator_version        = var.kubernetes_version
+    temporary_name_for_rotation = "azlinuxpool"
   }
 
   auto_scaler_profile {
