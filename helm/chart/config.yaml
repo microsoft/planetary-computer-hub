@@ -452,7 +452,7 @@ daskhub:
             c.Backend.cluster_options = cluster_options
     traefik:
       service:
-        type: LoadBalancer
+        type: ClusterIP
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
