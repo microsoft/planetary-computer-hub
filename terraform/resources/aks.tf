@@ -4,7 +4,7 @@ resource "azurerm_kubernetes_cluster" "pc_compute" {
   resource_group_name       = azurerm_resource_group.pc_compute.name
   dns_prefix                = "${var.maybe_versioned_prefix}-cluster"
   kubernetes_version        = var.kubernetes_version
-  sku_tier                  = "Paid"
+  sku_tier                  = "Standard"
   automatic_channel_upgrade = var.aks_automatic_channel_upgrade
 
   oms_agent {
@@ -28,6 +28,7 @@ resource "azurerm_kubernetes_cluster" "pc_compute" {
   default_node_pool {
     name            = "core"
     vm_size         = var.core_vm_size
+    os_sku          = "AzureLinux"
     os_disk_size_gb = 100
     # Managed for staging, since A-series VM don't support Ephemeral
     os_disk_type        = var.core_os_disk_type
@@ -40,7 +41,8 @@ resource "azurerm_kubernetes_cluster" "pc_compute" {
       "hub.jupyter.org/node-purpose" = "core"
     }
 
-    orchestrator_version = var.kubernetes_version
+    orchestrator_version        = var.kubernetes_version
+    temporary_name_for_rotation = "azlinuxpool"
   }
 
   auto_scaler_profile {
@@ -68,6 +70,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "user_pool" {
   name                  = "user"
   kubernetes_cluster_id = azurerm_kubernetes_cluster.pc_compute.id
   vm_size               = var.user_vm_size
+  os_sku                = "AzureLinux"
   enable_auto_scaling   = true
   os_disk_size_gb       = 200
   node_taints           = ["hub.jupyter.org_dedicated=user:NoSchedule"]
@@ -102,6 +105,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "cpu_worker_pool" {
   name                  = "cpuworker"
   kubernetes_cluster_id = azurerm_kubernetes_cluster.pc_compute.id
   vm_size               = var.cpu_worker_vm_size
+  os_sku                = "AzureLinux"
   enable_auto_scaling   = true
   os_disk_size_gb       = 128
   orchestrator_version  = var.kubernetes_version
