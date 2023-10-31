@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: nvidia-device-plugin-daemonset
-  namespace: prod
+  namespace: staging
 spec:
   selector:
     matchLabels:
