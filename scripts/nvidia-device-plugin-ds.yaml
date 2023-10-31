@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nvidia-device-plugin-daemonset
+  namespace: prod
+spec:
+  selector:
+    matchLabels:
+      name: nvidia-device-plugin-ds
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        name: nvidia-device-plugin-ds
+    spec:
+      # Use a nodeSelector to only schedule on GPU pods
+      nodeSelector:
+        accelerator: nvidia
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - key: "hub.jupyter.org_dedicated"
+          operator: "Equal"
+          value: "user"
+          effect: "NoSchedule"
+      priorityClassName: "system-node-critical"
+      containers:
+        - image: mcr.microsoft.com/oss/nvidia/k8s-device-plugin:v0.14.1
+          name: nvidia-device-plugin-ctr
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: device-plugin
+              mountPath: /var/lib/kubelet/device-plugins
+      volumes:
+        - name: device-plugin
+          hostPath:
+            path: /var/lib/kubelet/device-plugins

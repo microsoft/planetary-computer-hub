@@ -12,26 +12,26 @@ export GPU_NODE_VM_SIZE=Standard_NC4as_T4_v3
 
 # TODO(https://github.com/terraform-providers/terraform-provider-azurerm/issues/6793)
 # Add to terraform. Requires --aks-custom-headers support
-az aks nodepool add --name gpuworker \
+az aks nodepool add --name azgpuworker \
     --cluster-name ${CLUSTER_NAME} \
     --resource-group ${RESOURCE_GROUP_NAME} \
     --node-vm-size ${GPU_NODE_VM_SIZE} \
+    --os-sku AzureLinux \
     --enable-cluster-autoscaler \
     --node-count 0 \
     --min-count=0 --max-count 25 \
     --priority Spot \
     --eviction-policy Delete \
     --spot-max-price -1 \
-    --aks-custom-headers UseGPUDedicatedVHD=true \
     --labels k8s.dask.org/dedicated=worker pc.microsoft.com/workerkind=gpu
 # User GPU pool
-az aks nodepool add --name gpuuser \
+az aks nodepool add --name azgpuuser \
     --cluster-name ${CLUSTER_NAME} \
     --resource-group ${RESOURCE_GROUP_NAME} \
     --node-vm-size ${GPU_NODE_VM_SIZE} \
+    --os-sku AzureLinux \
     --enable-cluster-autoscaler \
     --node-count 0 \
     --min-count=0 --max-count 25 \
-    --aks-custom-headers UseGPUDedicatedVHD=true \
     --labels hub.jupyter.org/node-purpose=user hub.jupyter.org/pool-name=user-alpha-pool pc.microsoft.com/userkind=gpu \
     --node-taints "hub.jupyter.org_dedicated=user:NoSchedule"
