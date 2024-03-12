@@ -22,7 +22,6 @@ resource "helm_release" "dhub" {
     "${file("../../helm/jupyterhub_opencensus_monitor.yaml")}",
     "${templatefile("../../helm/profiles.yaml", { python_image = var.python_image, r_image = var.r_image, gpu_pytorch_image = var.gpu_pytorch_image, gpu_tensorflow_image = var.gpu_tensorflow_image, qgis_image = var.qgis_image })}",
     # workaround https://github.com/hashicorp/terraform-provider-helm/issues/669
-    "${templatefile("../../helm/kbatch-proxy-values.yaml", { jupyterhub_host = var.jupyterhub_host, dns_label = var.dns_label })}",
   ]
 
   set {
@@ -119,28 +118,6 @@ resource "helm_release" "dhub" {
   set {
     name  = "daskhub.dask-gateway.traefik.service.annotations.service\\.beta\\.kubernetes\\.io/azure-dns-label-name"
     value = "${var.dns_label}-dask"
-  }
-
-  # kbatch config
-  # Note that kbatch-proxy.app.extra_env.KBATCH_JOB_EXTRA_ENV is set up above through values
-  set {
-    name  = "daskhub.jupyterhub.hub.services.kbatch.api_token"
-    value = data.azurerm_key_vault_secret.kbatch_server_api_token.value
-  }
-
-  set {
-    name  = "daskhub.jupyterhub.hub.services.kbatch.url"
-    value = var.kbatch_proxy_url
-  }
-
-  set {
-    name  = "kbatch-proxy.app.jupyterhub_api_token"
-    value = data.azurerm_key_vault_secret.kbatch_server_api_token.value
-  }
-
-  set {
-    name  = "kbatch-proxy.app.jupyterhub_api_url"
-    value = "https://${var.jupyterhub_host}/compute/hub/api/"
   }
 
 }
