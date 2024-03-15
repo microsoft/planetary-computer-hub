@@ -37,9 +37,6 @@ module "resources" {
 
   kbatch_proxy_url = "http://dhub-prod-kbatch-proxy.prod.svc.cluster.local"
 
-  azure_client_id     = var.azure_client_id
-  azure_client_secret = var.azure_client_secret
-  azure_tenant_id     = var.azure_tenant_id
 }
 
 terraform {
@@ -59,15 +56,4 @@ output "resources" {
 # We require this, since we used to generate the pcccr ACR
 provider "azurerm" {
   features {}
-}
-
-# TODO(migration): Move to proper variables.
-variable "azure_client_id" {
-  type = string
-}
-variable "azure_client_secret" {
-  type = string
-}
-variable "azure_tenant_id" {
-  type = string
 }
