@@ -7,30 +7,20 @@ import httpx
 import asyncio
 
 
-async def check_image(image_name):
-    cmd = [
-        "az",
-        "acr",
-        "repository",
-        "show",
-        "--name=pcccr",
-        f"--image={image_name}",
-    ]
-    proc = await asyncio.create_subprocess_shell(" ".join(cmd))
-    await proc.wait()
-    return proc.returncode
+async def check_image(image_name: str) -> bool:
+    name, tag = image_name.split("/")[-1].split(":")
+    r = await httpx.AsyncClient().get(
+        f"https://mcr.microsoft.com/v2/planetary-computer/{name}/tags/list"
+    )
+    r.raise_for_status()
+    return tag not in r.json()["tags"]
 
 
 async def check_file(file):
     with open(file) as f:
         config = hcl.load(f)
 
-    images = [
-        "python_image",
-        "r_image",
-        "gpu_pytorch_image",
-        "gpu_tensorflow_image"
-    ]
+    images = ["python_image", "r_image", "gpu_pytorch_image", "gpu_tensorflow_image"]
 
     image_names = [
         config["module"]["resources"][image].split("/", 1)[1] for image in images
@@ -58,6 +48,7 @@ async def main(files):
         for image in errors:
             print(f"Missing image for {image}")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(asyncio.run(main(sys.argv[1:])))
