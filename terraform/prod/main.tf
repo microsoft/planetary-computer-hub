@@ -35,8 +35,6 @@ module "resources" {
   gpu_tensorflow_image             = "pcccr.azurecr.io/public/planetary-computer/gpu-tensorflow:2022.9.16.0"
   qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:3.18.0.1"
 
-  kbatch_proxy_url = "http://dhub-prod-kbatch-proxy.prod.svc.cluster.local"
-
 }
 
 terraform {
