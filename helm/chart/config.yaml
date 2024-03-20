@@ -231,6 +231,8 @@ daskhub:
             mountPath: /dev/shm
 
       extraEnv:
+        JUPYTERHUB_SERVICE_URL: "http://0.0.0.0:8888/compute/user/{JUPYTERHUB_USER}/"
+        JUPYTERHUB_SERVICE_PREFIX: "/compute/user/{JUPYTERHUB_USER}/"
         DASK_GATEWAY__CLUSTER__OPTIONS__IMAGE: '{JUPYTER_IMAGE_SPEC}'
         DASK_DISTRIBUTED__DASHBOARD__LINK: '/user/{JUPYTERHUB_USER}/proxy/{port}/status'
         DASK_LABEXTENSION__FACTORY__MODULE: 'dask_gateway'
