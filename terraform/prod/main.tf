@@ -27,13 +27,13 @@ module "resources" {
   user_placeholder_replicas = 1
   stac_url                  = "https://planetarycomputer.microsoft.com/api/stac/v1/"
 
-  jupyterhub_singleuser_image_name = "pcccr.azurecr.io/public/planetary-computer/python"
-  jupyterhub_singleuser_image_tag  = "2023.6.22.0"
-  python_image                     = "pcccr.azurecr.io/public/planetary-computer/python:2023.6.22.0"
-  r_image                          = "pcccr.azurecr.io/public/planetary-computer/r:2023.1.30.0"
-  gpu_pytorch_image                = "pcccr.azurecr.io/public/planetary-computer/gpu-pytorch:2022.9.16.0"
-  gpu_tensorflow_image             = "pcccr.azurecr.io/public/planetary-computer/gpu-tensorflow:2022.9.16.0"
-  qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:3.18.0.1"
+  jupyterhub_singleuser_image_name = "pcccr.azurecr.io/planetary-computer/python"
+  jupyterhub_singleuser_image_tag  = "2024.3.19.2"
+  python_image                     = "pcccr.azurecr.io/planetary-computer/python:2024.3.19.2"
+  r_image                          = "pcccr.azurecr.io/planetary-computer/r:2024.3.19.1"
+  gpu_pytorch_image                = "pcccr.azurecr.io/planetary-computer/gpu-pytorch:2024.3.19.3"
+  gpu_tensorflow_image             = "pcccr.azurecr.io/planetary-computer/gpu-tensorflow:2024.3.19.2"
+  qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:2024.3.19.7"
 
 }
 
