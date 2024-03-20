@@ -26,8 +26,8 @@ echo 'import warnings; warnings.filterwarnings("ignore", "format_bytes")' >> /sr
 echo "[Adding QGIS STAC plugin]"
 mkdir -p $HOME/.local/share/QGIS/QGIS3/profiles/default/python/plugins
 
-if [ -d /opt/conda/share/qgis_stac ]; then
-    mv -n /opt/conda/share/qgis_stac $HOME/.local/share/QGIS/QGIS3/profiles/default/python/plugins/
+if [ -d /srv/conda/envs/notebook/share/qgis_stac ]; then
+    mv -n /srv/conda/envs/notebook/share/qgis_stac $HOME/.local/share/QGIS/QGIS3/profiles/default/python/plugins/
 fi
 
 # Add an autostart entry for qgis
@@ -40,7 +40,7 @@ Version=0.9.4
 Type=Application
 Name=qgis
 Comment=Startup qgis
-Exec=/opt/conda/bin/qgis
+Exec=/srv/conda/envs/notebook/bin/qgis
 OnlyShowIn=XFCE;
 RunHook=0
 StartupNotify=false
