@@ -31,7 +31,7 @@ module "resources" {
   jupyterhub_singleuser_image_tag  = "2024.3.19.2"
   python_image                     = "pcccr.azurecr.io/planetary-computer/python:2024.3.20.1"
   r_image                          = "pcccr.azurecr.io/planetary-computer/r:2024.3.20.1"
-  gpu_pytorch_image                = "pcccr.azurecr.io/planetary-computer/gpu-pytorch:2024.3.20.1"
+  gpu_pytorch_image                = "pcccr.azurecr.io/planetary-computer/gpu-pytorch:2024.3.20.2"
   gpu_tensorflow_image             = "pcccr.azurecr.io/planetary-computer/gpu-tensorflow:2024.3.20.1"
   qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:2024.3.19.7"
 
