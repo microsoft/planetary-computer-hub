@@ -5,5 +5,7 @@ resource "azurerm_resource_group" "pc_compute" {
     environment = var.environment
     component   = "hub"
     ringValue   = "r1"
+
+    deployment_source = "https://github.com/microsoft/planetary-computer-hub/"
   }
 }
