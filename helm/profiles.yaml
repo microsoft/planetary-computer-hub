@@ -94,20 +94,20 @@ daskhub:
                   - gpu
 
 
-        # QGIS -----------------------------------------------------------------
-        - display_name: "QGIS (preview)"
-          description: '4 cores, 32 GiB of memory. QGIS geospatial environment. Currently in preview mode. <a ref="mailto:planetarycomputer@microsoft.com">Contact us</a> with feedback.'
-          kubespawner_override:
-            image: "${qgis_image}"
-            cpu_guarantee: 3
-            cpu_limit: 4
-            mem_guarantee: "24G"
-            mem_limit: "30G"
-            extra_resource_limits: {"nvidia.com/gpu": "0"}
-            default_url: "/desktop"
-            node_affinity_required:
-              - matchExpressions:
-                - key: pc.microsoft.com/userkind
-                  operator: NotIn
-                  values:
-                  - gpu
+        # # QGIS -----------------------------------------------------------------
+        # - display_name: "QGIS (preview)"
+        #   description: '4 cores, 32 GiB of memory. QGIS geospatial environment. Currently in preview mode. <a ref="mailto:planetarycomputer@microsoft.com">Contact us</a> with feedback.'
+        #   kubespawner_override:
+        #     image: "${qgis_image}"
+        #     cpu_guarantee: 3
+        #     cpu_limit: 4
+        #     mem_guarantee: "24G"
+        #     mem_limit: "30G"
+        #     extra_resource_limits: {"nvidia.com/gpu": "0"}
+        #     default_url: "/desktop"
+        #     node_affinity_required:
+        #       - matchExpressions:
+        #         - key: pc.microsoft.com/userkind
+        #           operator: NotIn
+        #           values:
+        #           - gpu

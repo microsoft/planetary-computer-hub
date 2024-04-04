@@ -158,34 +158,11 @@ variable "user_placeholder_replicas" {
   description = "The number of User placeholder replicas for JupyterHub (see https://zero-to-jupyterhub.readthedocs.io/en/latest/administrator/optimization.html#scaling-up-in-time-user-placeholders)."
 }
 
-variable "kbatch_proxy_url" {
-  type        = string
-  description = "URL (possibly kubernetes-internal) to the kbatch-server application."
-}
-
 
 variable "maybe_versioned_prefix" {
   type        = string
   description = "Temporary hack"
 }
-
-variable "azure_client_id" {
-  type        = string
-  description = "Temporary variable for dynamic provider."
-}
-
-variable "azure_client_secret" {
-  type        = string
-  default     = ""
-  description = "Temporary variable for dynamic provider."
-}
-
-variable "azure_tenant_id" {
-  type        = string
-  default     = ""
-  description = "Temporary variable for dynamic provider."
-}
-
 
 # -----------------
 # Local variables

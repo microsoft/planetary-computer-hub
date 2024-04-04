@@ -1,5 +1,5 @@
 name: Linting
-on: [pull_request, push]
+on: [pull_request]
 
 jobs:
   lint:
@@ -7,7 +7,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
-      - uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
       - uses: pre-commit/action@v2.0.0
