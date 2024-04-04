@@ -35,6 +35,9 @@ daskhub:
           admin_access: false
           admin_users:
             - taugspurger@microsoft.com
+            - guhidalgo@microsoft.com
+            - robemanuele@microsoft.com
+            - mmcfarland@microsoft.com
 
           authenticator_class: generic-oauth
         GenericOAuthenticator:
