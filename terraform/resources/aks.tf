@@ -7,6 +7,11 @@ resource "azurerm_kubernetes_cluster" "pc_compute" {
   sku_tier                  = "Standard"
   automatic_channel_upgrade = var.aks_automatic_channel_upgrade
 
+  # https://learn.microsoft.com/en-us/azure/aks/auto-upgrade-node-os-image
+  node_os_channel_upgrade = "NodeImage"
+  # https://learn.microsoft.com/en-us/azure/aks/image-cleaner
+  image_cleaner_enabled = true
+
   oms_agent {
     log_analytics_workspace_id = azurerm_log_analytics_workspace.pc_compute.id
   }
