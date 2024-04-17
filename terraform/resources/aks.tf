@@ -25,10 +25,6 @@ resource "azurerm_kubernetes_cluster" "pc_compute" {
     azure_rbac_enabled = true
   }
 
-  # Just setting this to match the preview default. Maybe enable in the future.
-  image_cleaner_enabled        = false
-  image_cleaner_interval_hours = 48
-
   # Core node-pool
   default_node_pool {
     name            = "core"
