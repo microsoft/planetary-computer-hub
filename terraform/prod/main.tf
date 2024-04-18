@@ -9,7 +9,7 @@ module "resources" {
   # AKS ----------------------------------------------------------------------
   kubernetes_version                                   = null
   aks_azure_active_directory_role_based_access_control = true
-  aks_automatic_channel_upgrade                        = "stable"
+  aks_automatic_channel_upgrade                        = "rapid"
 
   # 8GB of RAM, 4 CPU cores, ssd base disk
   core_vm_size              = "Standard_E4s_v3"
