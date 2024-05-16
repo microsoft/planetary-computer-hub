@@ -6,6 +6,8 @@ module "resources" {
   maybe_versioned_prefix = "pcc-prod-2"
   # subscription = "Planetary Computer"
 
+  apim_resource_id = "/subscriptions/9da7523a-cb61-4c3e-b1d4-afa5fc6d2da9/resourceGroups/pc-manual-resources/providers/Microsoft.ApiManagement/service/planetarycomputer"
+
   # AKS ----------------------------------------------------------------------
   kubernetes_version                                   = null
   aks_azure_active_directory_role_based_access_control = true

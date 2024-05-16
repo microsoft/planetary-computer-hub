@@ -89,6 +89,11 @@ variable "qgis_image" {
   description = "The tag for the QGIS environment image."
 }
 
+variable "apim_resource_id" {
+  type        = string
+  description = "The resource ID for the API Management service."
+}
+
 # ----------------------------------------------------------------------------
 # AKS
 

@@ -7,6 +7,9 @@ resource "azurerm_kubernetes_cluster" "pc_compute" {
   sku_tier                  = "Standard"
   automatic_channel_upgrade = var.aks_automatic_channel_upgrade
 
+  oidc_issuer_enabled       = true
+  workload_identity_enabled = true
+
   # https://learn.microsoft.com/en-us/azure/aks/auto-upgrade-node-os-image
   node_os_channel_upgrade = "NodeImage"
   # https://learn.microsoft.com/en-us/azure/aks/image-cleaner
@@ -138,4 +141,29 @@ resource "azurerm_kubernetes_cluster_node_pool" "cpu_worker_pool" {
     ]
   }
 
+}
+
+# Workload Identity for hub access to API Management
+resource "azurerm_user_assigned_identity" "hub" {
+  name                = "id-${local.maybe_staging_prefix}"
+  location            = azurerm_resource_group.pc_compute.location
+  resource_group_name = azurerm_resource_group.pc_compute.name
+}
+
+# Give the hub identity access to the API Management service
+resource "azurerm_role_assignment" "hub-identity-apim-contributor" {
+  scope                = var.apim_resource_id
+  role_definition_name = "API Management Service Contributor"
+  principal_id         = azurerm_user_assigned_identity.hub.principal_id
+}
+
+# Create a FIC to map the hub identity into the service account that is used by the hub
+resource "azurerm_federated_identity_credential" "hub" {
+  name                = "federated-id-${local.maybe_staging_prefix}"
+  resource_group_name = azurerm_resource_group.pc_compute.name
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = azurerm_kubernetes_cluster.pc_compute.oidc_issuer_url
+  subject             = "system:serviceaccount:${var.environment}:hub"
+  parent_id           = azurerm_user_assigned_identity.hub.id
+  timeouts {}
 }
