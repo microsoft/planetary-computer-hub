@@ -88,6 +88,9 @@ daskhub:
       extraConfig:
         # mylabels: |
         #   c.KubeSpawner.extra_labels = {}
+        announce: |
+          c.JupyterHub.template_vars = {'announcement': 'The Planetary Computer Hub is being retired on June 6th. See the <a href="https://github.com/microsoft/PlanetaryComputer/discussions/347">GitHub Discussion</a> for more information.'}
+
         kubespawner: |
           c.KubeSpawner.start_timeout = 20 * 60  # 20 minutes
         01-add-dask-gateway-values: |
