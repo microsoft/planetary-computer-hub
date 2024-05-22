@@ -3,6 +3,9 @@
 [![Hub - production](https://img.shields.io/badge/Hub-production-blue)](http://planetarycomputer.microsoft.com/compute)
 [![Hub - staging](https://img.shields.io/badge/Hub-staging-blue)](http://planetarycomputer-staging.microsoft.com/compute)
 
+> [!NOTE]
+> The Planetary Computer Hub will be retired on the 6th of June 2024. See https://github.com/microsoft/PlanetaryComputer/discussions/347 for more.
+
 This repository contains the configuration and continuous deployment for the [Planetary Computer's Hub][hub], a [Dask-Gateway][gateway] enabled [JupyterHub][jupyterhub] deployment focused on supporting scalable geospatial analysis.
 
 For general questions or discussions about the Planetary Computer, use the [microsoft/PlanetaryComputer](http://github.com/microsoft/PlanetaryComputer) repository.
