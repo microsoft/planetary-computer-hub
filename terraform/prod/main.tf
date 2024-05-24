@@ -10,7 +10,7 @@ module "resources" {
   # TLS certs
   certificate_kv          = "pc-deploy-secrets"
   certificate_kv_rg       = "pc-manual-resources"
-  certificate_secret_name = "planetarycomputer-hub-prod"
+  certificate_secret_name = "planetarycomputer-hub-production"
   pip_name                = "pip-pcc-prod"
   appgw_name              = "appgw-pcc-prod"
 
