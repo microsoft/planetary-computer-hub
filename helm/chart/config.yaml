@@ -20,6 +20,15 @@ daskhub:
         name: pcccr.azurecr.io/jupyterhub/k8s-hub
         tag: "2.0.0.post0"
 
+      labels:
+        azure.workload.identity/use: "true"
+
+      # Ensure the hub service account is created and used. The annotation to
+      # attach a managed identity is set in terraform.
+      serviceAccount:
+        create: true
+        name: hub
+
       networkPolicy:
         ingress:
           - ports:
@@ -55,11 +64,8 @@ daskhub:
           scope:
             - openid
 
-      extraEnv:
-        # This service principal has read permission on Azure API management.
-        AZURE_TENANT_ID: "72f988bf-86f1-41af-91ab-2d7cd011db47"
-        AZURE_CLIENT_ID: "185e2bd5-f11e-490c-8849-7889951120b4"
-        # AZURE_CLIENT_SECRET, PC_ID_TOKEN, APPLICATIONINSIGHTS_CONNECTION_STRING are set via terraform
+#      extraEnv:
+        # PC_ID_TOKEN, APPLICATIONINSIGHTS_CONNECTION_STRING are set via terraform
 
       extraFiles:
         jupyterhub_opencensus_monitor:

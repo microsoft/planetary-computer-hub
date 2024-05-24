@@ -35,6 +35,11 @@ resource "helm_release" "dhub" {
   # }
 
   set {
+    name  = "daskhub.jupyterhub.hub.serviceAccount.annotations.azure\\.workload\\.identity/client-id"
+    value = azurerm_user_assigned_identity.hub.client_id
+  }
+
+  set {
     name  = "daskhub.jupyterhub.hub.config.GenericOAuthenticator.oauth_callback_url"
     value = "https://${var.jupyterhub_host}/compute/hub/oauth_callback"
   }
@@ -42,11 +47,6 @@ resource "helm_release" "dhub" {
   set {
     name  = "daskhub.jupyterhub.hub.config.GenericOAuthenticator.client_secret"
     value = data.azurerm_key_vault_secret.id_client_secret.value
-  }
-
-  set {
-    name  = "daskhub.jupyterhub.hub.extraEnv.AZURE_CLIENT_SECRET"
-    value = data.azurerm_key_vault_secret.azure_client_secret.value
   }
 
   set {
@@ -119,7 +119,6 @@ resource "helm_release" "dhub" {
     name  = "daskhub.dask-gateway.traefik.service.annotations.service\\.beta\\.kubernetes\\.io/azure-dns-label-name"
     value = "${var.dns_label}-dask"
   }
-
 }
 
 data "azurerm_storage_account" "pc-compute" {

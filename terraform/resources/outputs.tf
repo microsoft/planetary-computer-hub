@@ -11,11 +11,6 @@ output "id_client_secret" {
   sensitive = true
 }
 
-output "azure_client_secret" {
-  value     = data.azurerm_key_vault_secret.azure_client_secret.value
-  sensitive = true
-}
-
 output "pc_id_token" {
   value     = data.azurerm_key_vault_secret.pc_id_token.value
   sensitive = true
