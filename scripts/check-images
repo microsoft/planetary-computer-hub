@@ -6,17 +6,6 @@ import asyncio
 
 async def check_image(image_name):
     return 0
-    cmd = [
-        "az",
-        "acr",
-        "repository",
-        "show",
-        "--name=pcccr",
-        f"--image={image_name}",
-    ]
-    proc = await asyncio.create_subprocess_shell(" ".join(cmd))
-    await proc.wait()
-    return proc.returncode
 
 
 async def check_file(file):

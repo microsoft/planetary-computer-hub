@@ -18,7 +18,7 @@ daskhub:
       baseUrl: "/compute/"
       image:
         name: pcccr.azurecr.io/jupyterhub/k8s-hub
-        tag: "1.0.1.post0"
+        tag: "2.0.0.post0"
 
       networkPolicy:
         ingress:
@@ -48,7 +48,12 @@ daskhub:
           token_url: 'https://${oauth_host}.microsoft.com/id/o/token/'
           authorize_url: 'https://${oauth_host}.microsoft.com/id/o/authorize/'
           username_key: 'email'
+          # TODO: fix the warning here.
+          # Config option `userdata_method` not recognized by `GenericOAuthenticator`.
+          #  Did you mean one of: `userdata_params, userdata_token_method, userdata_url`?
           userdata_method: 'GET'
+          scope:
+            - openid
 
       extraEnv:
         # This service principal has read permission on Azure API management.
@@ -179,8 +184,8 @@ daskhub:
         networkPolicy:
           ingress:
             - ports:
-              - port: http
               - port: https
+              - port: http
               from:
                 - podSelector:
                     matchLabels:

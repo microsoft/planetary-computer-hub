@@ -46,7 +46,7 @@ resource "azurerm_kubernetes_cluster" "pc_compute" {
     }
 
     orchestrator_version        = var.kubernetes_version
-    temporary_name_for_rotation = "azlinuxpool"
+    temporary_name_for_rotation = "tmpdefault"
   }
 
   auto_scaler_profile {
