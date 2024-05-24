@@ -9,6 +9,8 @@ daskhub:
         enabled: true
       userScheduler:
         enabled: false
+      userPlaceholder:
+        enabled: false
       corePods:
         nodeAffinity:
           matchNodePurpose: "require"
