@@ -46,7 +46,12 @@ resource "azurerm_kubernetes_cluster" "pc_compute" {
     }
 
     orchestrator_version        = var.kubernetes_version
-    temporary_name_for_rotation = "tmpdefault"
+    temporary_name_for_rotation = "azlinuxpool"
+
+    upgrade_settings {
+      max_surge = "10%"
+    }
+
   }
 
   auto_scaler_profile {
@@ -56,6 +61,15 @@ resource "azurerm_kubernetes_cluster" "pc_compute" {
     scale_down_delay_after_add  = "5m"
     skip_nodes_with_system_pods = false # ensures system pods don't keep GPU nodes alive
   }
+
+  ingress_application_gateway {
+    gateway_id = data.azurerm_application_gateway.pc_compute.id
+  }
+
+  key_vault_secrets_provider {
+    secret_rotation_enabled = true
+  }
+
   identity {
     type = "SystemAssigned"
   }

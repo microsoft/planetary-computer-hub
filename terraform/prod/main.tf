@@ -7,6 +7,12 @@ module "resources" {
   # subscription = "Planetary Computer"
 
   apim_resource_id = "/subscriptions/9da7523a-cb61-4c3e-b1d4-afa5fc6d2da9/resourceGroups/pc-manual-resources/providers/Microsoft.ApiManagement/service/planetarycomputer"
+  # TLS certs
+  certificate_kv          = "pc-deploy-secrets"
+  certificate_kv_rg       = "pc-manual-resources"
+  certificate_secret_name = "planetarycomputer-hub-staging"
+  pip_name                = "pip-pcc-prod"
+  appgw_name              = "appgw-pcc-prod"
 
   # AKS ----------------------------------------------------------------------
   kubernetes_version                                   = null
@@ -25,7 +31,7 @@ module "resources" {
   # DaskHub ------------------------------------------------------------------
   dns_label                 = "pccompute"
   oauth_host                = "planetarycomputer"
-  jupyterhub_host           = "pccompute.westeurope.cloudapp.azure.com"
+  jupyterhub_host           = "planetarycomputer-hub.microsoft.com"
   user_placeholder_replicas = 1
   stac_url                  = "https://planetarycomputer.microsoft.com/api/stac/v1/"
 

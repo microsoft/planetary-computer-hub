@@ -122,6 +122,11 @@ $ az keyvault secret set --vault-name pc-deploy-secrets --name '<prefix>--<key-n
 | pcc--velero-azure-client-id                | Set in `velero_credentials.tpl` for backups / migrations                                                                                                      |
 | pcc--velero-azure-client-secret            | Set in `velero_credentials.tpl` for backups / migrations                                                                                                      |
 
+
+```
+az keyvault secret set --vault-name pc-deploy-secrets -n pcc-test-jupyterhub-proxy-secret-token --value (openssl rand -hex 32)
+```
+
 ## Continuous deployment
 
 This repository deploys on commits to the staging environment on commits `main`. We commit to production on tags.
@@ -186,6 +191,73 @@ We're able to customize the JupyterHub and jupyterlab UIs following the approach
 
 To test changes to the templates locally, [install jupyterhub](https://jupyterhub.readthedocs.io/en/stable/installation-guide.html) and run it from the root of the project directory, which includes a `jupyterhub_config.py` file. Changes to the template files in `helm/chart/files/etc/jupyterhub/templates/` can be previewed at `localhost:8000`.
 
+## Ingress
+
+This setup uses [Application Gateway Ingress Controller][agic] to serve traffic
+over HTTPs without directly exposing the Kubernetes cluster to the internet.
+
+We've chosen to create and manage the Application Gateway *outside* of
+Terraform. The Ingress Controller also wants to make changes to it as Ingress
+routes are added, causing some ownership conflicts over the Application Gateway.
+
+```
+set -x RESOURCE_GROUP ... # RG with the AKS cluster
+set -x KEYVAULT_NAME ...  # Keyvault with the TLS cert
+set -x VNET_NAME ...      # VNET with the AKS cluster
+set -x SUBNET_NAME ...    # Subnet with the AKS cluster
+set -x APPGW_NAME ...     # pick whatever
+set -x PUBLIC_IP ...      # the name of the public IP created by Terraform
+set -x MI_NAME pcc-mi     # The name of the managed identity created by Terraform
+set -x CLUSTER_NAME ...   # The name of the AKS cluster
+
+# Derived variables
+set -x MI_CLIENT_ID (az identity show -n $MI_NAME -g $RESOURCE_GROUP --query clientId -o tsv)
+set -x MI_SCOPE (az identity show -g $RESOURCE_GROUP -n $MI_NAME --query id -o tsv)
+set -x RG_ID (az group show -n $RESOURCE_GROUP --query id -o tsv)
+```
+
+With these variables set, we can create the Application Gateway and configure
+it. If you're deploying from scratch, you'll need to do a `terraform apply`
+first with `data.azurerm_application_gateway.pc_compute` disabled, along with
+all references to it (e.g. in the AKS cluster)
+
+```
+# az keyvault network-rule add --subnet (az network vnet subnet show -n $SUBNET_NAME -g $RESOURCE_GROUP --vnet-name $VNET_NAME --query id -o tsv) -n $KEYVAULT_NAME
+
+az network application-gateway create \
+	-n $APPGW_NAME \
+	-g $RESOURCE_GROUP \
+	--sku Standard_v2 \
+	--public-ip-address $PUBLIC_IP \
+	--vnet-name $VNET_NAME \
+	--subnet $SUBNET_NAME \
+	--priority 19500
+
+set -x APPGW_ID (az network application-gateway show -n $APPGW_NAME -g $RESOURCE_GROUP -o tsv --query "id")
+az role assignment create --role "Network Contributor" --scope (az group show -n $RESOURCE_GROUP --query id -o tsv) --assignee $MI_CLIENT_ID
+
+az role assignment create --role Reader --scope $RG_ID --assignee 89ecce7c-7849-4802-9063-ee22b34609d1
+az role assignment create --role Contributor --scope $APPGW_ID --assignee 89ecce7c-7849-4802-9063-ee22b34609d1
+```
+
+Now you can get the Ingress Controller added to the AKS cluster
+
+```
+terraform apply
+```
+
+Finally, we need to ensure that the managed identity has the necessary
+permissions to manage the Application Gateway.
+
+```
+set -x INGRESS_MI (az aks show -g $RESOURCE_GROUP -n $CLUSTER_NAME --query addonProfiles.ingressApplicationGateway.identity.clientId -o tsv)
+
+
+az role assignment create --role "Contributor" --scope $APPGW_ID --assignee $INGRESS_MI
+az role assignment create --role "Owner" --scope "$MI_SCOPE" --assignee $INGRESS_MI
+az keyvault set-policy --name pc-test-deploy-secrets --secret-permissions get --object-id (az identity show -n pcc-mi -g pcc-test-rg --query principalId -o tsv)
+```
+
 ## Additional References
 
 Many of the concepts used here were learned in deployments at the [pangeo-cloud-federation](https://github.com/pangeo-data/pangeo-cloud-federation) and [2i2c pilot hubs](https://github.com/2i2c-org/pilot-hubs). Those might serve as additional references for how to deploy a Hub.
@@ -220,3 +292,4 @@ Any use of third-party trademarks or logos are subject to those third-party's po
 [deployment guide]: https://planetarycomputer.microsoft.com/docs/concepts/hub-deployment/
 [sp]: https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals
 [hub-service]: https://jupyterhub.readthedocs.io/en/stable/reference/services.html
+[agic]: https://learn.microsoft.com/en-us/azure/application-gateway/ingress-controller-overview

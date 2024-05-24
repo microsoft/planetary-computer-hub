@@ -1,18 +1,17 @@
 module "resources" {
   source                 = "../resources"
-  environment            = "staging"
+  environment            = "test"
   region                 = "West Europe"
   version_number         = "2"
-  maybe_versioned_prefix = "pcc-staging-2"
-  # subscription = "Planetary Computer"
+  maybe_versioned_prefix = "pcc-test"
 
   apim_resource_id = "/subscriptions/9da7523a-cb61-4c3e-b1d4-afa5fc6d2da9/resourceGroups/pc-manual-resources/providers/Microsoft.ApiManagement/service/planetarycomputer"
   # TLS certs
-  certificate_kv          = "pc-deploy-secrets"
-  certificate_kv_rg       = "pc-manual-resources"
-  certificate_secret_name = "planetarycomputer-hub-staging"
-  pip_name                = "pip-pcc-staging"
-  appgw_name              = "appgw-pcc-staging"
+  certificate_kv          = "pc-test-deploy-secrets"
+  certificate_kv_rg       = "pc-test-manual-resources"
+  certificate_secret_name = "planetarycomputer-hub-test"
+  pip_name                = "pccompute-public-ip"
+  appgw_name              = "pccompute-appgateway"
 
   # AKS ----------------------------------------------------------------------
   kubernetes_version                                   = null
@@ -29,9 +28,9 @@ module "resources" {
   workspace_id = "83dcaf36e047a90f"
 
   # DaskHub ------------------------------------------------------------------
-  dns_label                 = "pcc-staging"
+  dns_label                 = "planetarycomputer-hub-test"
   oauth_host                = "planetarycomputer-staging"
-  jupyterhub_host           = "planetarycomputer-hub-staging.microsoft.com"
+  jupyterhub_host           = "planetarycomputer-hub-test.microsoft.com"
   user_placeholder_replicas = 0
   stac_url                  = "https://planetarycomputer-staging.microsoft.com/api/stac/v1/"
 
@@ -42,15 +41,14 @@ module "resources" {
   gpu_pytorch_image                = "pcccr.azurecr.io/planetary-computer/gpu-pytorch:2024.3.22.0"
   gpu_tensorflow_image             = "pcccr.azurecr.io/planetary-computer/gpu-tensorflow:2024.3.22.0"
   qgis_image                       = "pcccr.azurecr.io/planetary-computer/qgis:2024.3.19.7"
-
 }
 
 terraform {
   backend "azurerm" {
-    resource_group_name  = "pc-manual-resources"
-    storage_account_name = "pctfstate"
+    resource_group_name  = "pc-test-manual-resources"
+    storage_account_name = "pctesttfstate"
     container_name       = "pcc"
-    key                  = "staging-2.tfstate"
+    key                  = "pcc.tfstate"
   }
 }
 
